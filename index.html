@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>منصة التفكير البصري | د. أشرف رشاد</title>
+    <style>
+        :root { --gold: #D4AF37; --blue: #002366; --bg: #f0f2f5; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; }
+        header { background: var(--blue); color: var(--gold); padding: 30px; text-align: center; border-bottom: 6px solid var(--gold); }
+        .hero { background: white; padding: 20px; margin: 20px auto; max-width: 900px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; border: 1px solid #ddd; }
+        .card:hover { border-color: var(--gold); transform: scale(1.05); }
+        .card h3 { color: var(--blue); }
+        #canvas-container { display: none; background: white; padding: 20px; text-align: center; }
+        canvas { border: 3px solid var(--blue); background: #fff; cursor: crosshair; }
+        .btn { background: var(--gold); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        footer { background: #222; color: #888; text-align: center; padding: 15px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌍 منصة الجيومورفولوجيا الرقمية</h1>
+    <p>جامعة قنا - كلية التربية | إعداد: أشرف رشاد صابر</p>
+</header>
+
+<div class="hero">
+    <h2>مرحباً بك في رحلة التفكير البصري</h2>
+    <p>اختر الجلسة التعليمية المقررة عليك اليوم من واقع "ملحق الأنشطة":</p>
+    
+    <div class="grid">
+        <div class="card" onclick="startActivity('الزلازل', 3)">
+            <h3>الجلسة 1: الزلازل</h3>
+            <p>ص 3 - ص 13</p>
+        </div>
+        <div class="card" onclick="startActivity('البراكين', 15)">
+            <h3>الجلسة 2: البراكين</h3>
+            <p>ص 15 - ص 24</p>
+        </div>
+        <div class="card" onclick="startActivity('الالتواءات', 26)">
+            <h3>الجلسة 3: الالتواءات</h3>
+            <p>ص 26 - ص 36</p>
+        </div>
+        <div class="card" onclick="startActivity('الانكسارات', 38)">
+            <h3>الجلسة 4: الانكسارات</h3>
+            <p>ص 38 - ص 48</p>
+        </div>
+    </div>
+</div>
+
+<div id="canvas-container">
+    <h2 id="session-title"></h2>
+    <p>استخدم المرسم أدناه لتطبيق مهارة <strong>التصور الذهني</strong> للظاهرة:</p>
+    <canvas id="mainCanvas" width="700" height="400"></canvas>
+    <br><br>
+    <button class="btn" onclick="saveDrawing()">حفظ الرسم وإرساله للمعلم</button>
+    <button class="btn" style="background:#666" onclick="location.reload()">العودة للقائمة</button>
+</div>
+
+<footer>
+    <p>إشراف: أ.د/ حسين عبد الباسط - أ.د/ باسم سلام - أ.م.د/ طارق أبو الفضل</p>
+    <p>© جميع الحقوق محفوظة لجامعة قنا ٢٠٢٦</p>
+</footer>
+
+<script>
+    function startActivity(name, page) {
+        document.querySelector('.hero').style.display = 'none';
+        document.getElementById('canvas-container').style.display = 'block';
+        document.getElementById('session-title').innerText = "نشاط " + name + " (راجع ص " + page + ")";
+        initDrawing();
+    }
+
+    function initDrawing() {
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+
+        function startPosition(e) { painting = true; draw(e); }
+        function finishedPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!painting) return;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#002366';
+            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', finishedPosition);
+        canvas.addEventListener('mousemove', draw);
+    }
+
+    function saveDrawing() {
+        alert("تم حفظ رسمك بنجاح عزيزى الطالب! سيقوم د. أشرف بمراجعته وتقييم مهارة التصور الذهني لديك.");
+    }
+</script>
+</body>
+</html>
