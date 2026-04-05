@@ -3,184 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التفكير البصري الجيومورفولوجي | د. أشرف رشاد صابر</title>
+    <title>منصة التفكير البصري الجيومورفولوجي | د. أشرف رشاد</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --earth-brown: #5D4037; --magma-orange: #E64A19; --river-blue: #1976D2;
-            --sand-beige: #F5F5DC; --stone-grey: #757575; --grass-green: #388E3C;
-        }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--sand-beige); margin: 0; color: #333; line-height: 1.6; }
-        header { background: var(--earth-brown); color: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--magma-orange); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
+        :root { --earth: #5D4037; --magma: #E64A19; --river: #1976D2; --sand: #F5F5DC; --stone: #757575; }
+        body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; color: #333; }
+        header { background: var(--earth); color: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--magma); }
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
         
         /* Dashboard */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 20px; }
-        .session-card { background: white; border-radius: 15px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .session-card:hover { border-color: var(--magma-orange); transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .session-card h3 { color: var(--earth-brown); margin: 10px 0; border-bottom: 2px solid var(--sand-beige); padding-bottom: 10px; }
-        
-        /* Activity Screen */
-        #activity-screen { display: none; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: fadeIn 0.5s; }
-        .skill-badge { display: inline-block; background: var(--magma-orange); color: white; padding: 5px 20px; border-radius: 50px; font-weight: bold; margin-bottom: 15px; }
-        
-        /* Drawing Studio */
-        .studio-box { background: #fdfdfd; border: 2px solid var(--earth-brown); border-radius: 15px; padding: 15px; margin-top: 25px; }
-        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; background: #eee; padding: 12px; border-radius: 10px; margin-bottom: 15px; }
-        .tool-btn { padding: 8px 15px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: white; font-family: 'Cairo'; font-weight: bold; }
-        .tool-btn:hover { background: #ddd; }
-        canvas { background: white; border: 1px solid #333; display: block; margin: 0 auto; max-width: 100%; cursor: crosshair; touch-action: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        
-        /* Form Elements */
-        textarea { width: 100%; height: 120px; border: 2px solid #ddd; border-radius: 10px; padding: 15px; font-family: 'Cairo'; margin: 15px 0; font-size: 16px; box-sizing: border-box; }
-        .action-btns { display: flex; gap: 15px; justify-content: center; margin-top: 25px; }
-        .btn-main { padding: 12px 35px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 17px; transition: 0.3s; }
-        .btn-save { background: var(--grass-green); color: white; }
-        .btn-back { background: var(--stone-grey); color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        .card:hover { border-color: var(--magma); transform: translateY(-10px); }
+        .card h3 { color: var(--earth); margin-top: 0; }
 
-        /* Preview Modal */
-        #previewModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 15px; z-index: 1000; box-shadow: 0 0 100px rgba(0,0,0,0.8); text-align: center; width: 80%; max-width: 600px; }
-        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; }
+        /* Activity Screen */
+        #activity-screen { display: none; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .skills-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; background: #eee; padding: 15px; border-radius: 10px; justify-content: center; }
+        .skill-btn { padding: 8px 15px; border: none; border-radius: 20px; cursor: pointer; background: white; font-weight: bold; border: 1px solid #ccc; transition: 0.2s; }
+        .skill-btn.active { background: var(--magma); color: white; border-color: var(--magma); }
+
+        /* Visual Content */
+        .visual-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 800px) { .visual-container { grid-template-columns: 1fr; } }
+        .geo-img { width: 100%; border-radius: 10px; border: 2px solid #ddd; object-fit: contain; background: #fafafa; height: 350px; }
         
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Drawing & Interaction */
+        canvas { border: 2px solid var(--earth); background: white; width: 100%; height: 350px; cursor: crosshair; touch-action: none; border-radius: 10px; }
+        textarea { width: 100%; height: 120px; padding: 15px; border-radius: 10px; border: 2px solid #ddd; font-family: 'Cairo'; font-size: 16px; margin-top: 10px; box-sizing: border-box; }
+        
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn-save { background: #2E7D32; color: white; }
+        .btn-back { background: var(--stone); color: white; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>🌍 منصة المحقق البصري الجيومورفولوجي</h1>
-    <p>إعداد الباحث: أشرف رشاد صابر</p>
-    <p>إشراف: أ.د/ حسين عبد الباسط - أ.د/ باسم سلام - أ.م.د/ طارق أبو الفضل</p>
+    <h1>🌍 منصة المحقق البصري الجيومورفولوجي الرقمية</h1>
+    <p>إعداد الباحث: أشرف رشاد صابر | كلية التربية - جامعة قنا</p>
 </header>
 
 <div class="container">
     <div id="main-menu">
-        <h2 style="text-align:center; color: var(--earth-brown);">اختر الجلسة التعليمية (من الجلسات الآتية)</h2>
-        <div class="grid-container">
-            <div class="session-card" onclick="openSession(0)"><h3>1. الزلازل</h3><p>
-            <div class="session-card" onclick="openSession(1)"><h3>2. البراكين</h3><p>
-            <div class="session-card" onclick="openSession(2)"><h3>3. الالتواءات</h3><p>
-            <div class="session-card" onclick="openSession(3)"><h3>4. الانكسارات</h3><p>
-            <div class="session-card" onclick="openSession(4)"><h3>5. التجوية</h3><p>
-            <div class="session-card" onclick="openSession(5)"><h3>6. التعرية الرياحية</h3><p>
-            <div class="session-card" onclick="openSession(6)"><h3>7. التعرية النهرية</h3><p>
-            <div class="session-card" onclick="openSession(7)"><h3>8. التعرية البحرية</h3><p>
+        <h2 style="text-align:center; color: var(--earth);">اختر الجلسة التعليمية المستهدفة:</h2>
+        <div class="grid">
+            <div class="card" onclick="startSession(0)"><h3>1. الزلازل</h3><p>ص 3 - 14</p></div>
+            <div class="card" onclick="startSession(1)"><h3>2. البراكين</h3><p>ص 15 - 25</p></div>
+            <div class="card" onclick="startSession(2)"><h3>3. الالتواءات</h3><p>ص 26 - 37</p></div>
+            <div class="card" onclick="startSession(3)"><h3>4. الانكسارات</h3><p>ص 38 - 49</p></div>
+            <div class="card" onclick="startSession(4)"><h3>5. التجوية</h3><p>ص 50 - 69</p></div>
+            <div class="card" onclick="startSession(5)"><h3>6. التعرية الهوائية</h3><p>ص 70 - 89</p></div>
+            <div class="card" onclick="startSession(6)"><h3>7. التعرية النهرية</h3><p>ص 90 - 109</p></div>
+            <div class="card" onclick="startSession(7)"><h3>8. التعرية البحرية</h3><p>ص 110 - 125</p></div>
         </div>
     </div>
 
     <div id="activity-screen">
-        <div id="skill-badge" class="skill-badge"></div>
-        <h2 id="act-title" style="color: var(--earth-brown); margin: 0;"></h2>
-        <p id="act-instruction" style="font-size: 1.1em; color: #555;"></p>
-        
-        <label>📝 سجل تحليلك البصري وإجابتك على النشاط:</label>
-        <textarea id="text-answer" placeholder="اكتب ما تراه وتحلله في الظاهرة الجغرافية..."></textarea>
-
-        <div class="studio-box">
-            <p style="margin:0 0 10px 0; font-weight:bold;">🎨 المرسم الجغرافي (تنمية مهارة التصور الذهني):</p>
-            <div class="toolbar">
-                <input type="color" id="colorPicker" title="اختر اللون" value="#5D4037">
-                <input type="range" id="penWidth" min="1" max="15" value="3" title="سمك الخط">
-                <button class="tool-btn" onclick="undo()">↩️ تراجع</button>
-                <button class="tool-btn" onclick="redo()">↪️ تقديم</button>
-                <button class="tool-btn" onclick="clearCanvas()" style="color:red">🗑️ مسح</button>
-                <button class="tool-btn" onclick="previewImage()" style="background:var(--river-blue); color:white;">👁️ معاينة</button>
+        <h2 id="session-title" style="color: var(--earth); margin-bottom: 5px;"></h2>
+        <div class="skills-nav" id="skills-tabs">
             </div>
-            <canvas id="geoCanvas" width="800" height="400"></canvas>
+
+        <div class="visual-container">
+            <div class="input-section">
+                <h3 id="skill-title" style="color: var(--magma);"></h3>
+                <p id="activity-task" style="font-weight: bold; font-size: 1.1em;"></p>
+                <textarea id="answer-box" placeholder="اكتب تحليلك الجغرافي بناءً على رؤيتك البصرية..."></textarea>
+            </div>
+            
+            <div class="media-section" id="drawing-room" style="display:none;">
+                <p>🎨 المرسم الجغرافي (التصور الذهني):</p>
+                <div style="background:#eee; padding:5px; border-radius:5px 5px 0 0; display:flex; gap:5px;">
+                    <input type="color" id="penColor" value="#5D4037">
+                    <button onclick="clearCanvas()">مسح</button>
+                </div>
+                <canvas id="geoCanvas"></canvas>
+            </div>
+            
+            <div class="media-section" id="image-room">
+                <p>🖼️ الصورة التوضيحية للنشاط:</p>
+                <img id="task-img" src="" class="geo-img" alt="صورة النشاط">
+            </div>
         </div>
 
-        <div class="action-btns">
-            <button class="btn-main btn-save" onclick="saveAndSubmit()">💾 حفظ وإرسال النشاط</button>
-            <button class="btn-main btn-back" onclick="goBack()">🏠 العودة للقائمة</button>
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="saveActivity()">💾 حفظ وإرسال النشاط</button>
+            <button class="btn btn-back" onclick="location.reload()">🏠 قائمة الجلسات</button>
         </div>
     </div>
 </div>
 
-<div class="overlay" id="overlay" onclick="closePreview()"></div>
-<div id="previewModal">
-    <h3>🔍 معاينة الرسم والتحليل</h3>
-    <img id="previewImg" style="max-width:100%; border:2px solid #ddd; border-radius:10px;">
-    <p id="previewText" style="margin-top:10px; font-style:italic;"></p>
-    <button class="btn-main btn-back" onclick="closePreview()">إغلاق</button>
-</div>
-
 <script>
-    const data = [
-        { title: "الجلسة 1: الزلازل", skill: "التحليل والتمييز البصري", task: "نشاط: ميز بين بؤرة الزلزال والمركز السطحي من خلال الرسم (ص 4)." },
-        { title: "الجلسة 2: البراكين", skill: "القراءة البصرية والتفسير", task: "نشاط: صف بصرياً أجزاء المخروط البركاني ومدى انحداره (ص 18)." },
-        { title: "الجلسة 3: الالتواءات", skill: "التصنيف والتحويل البصري", task: "نشاط: حول الرسم الكروكي للالتواء البسيط إلى ثنية محدبة (ص 29)." },
-        { title: "الجلسة 4: الانكسارات", skill: "التعرف المكاني والتحليل", task: "نشاط: حدد مناطق الضعف في القشرة الأرضية المؤدية للانكسار (ص 41)." },
-        { title: "الجلسة 5: التعرية النهرية", skill: "التتابع والتصور الذهني", task: "نشاط: تخيل وارسم مراحل تكوين المنعطفات النهرية (ص 55)." },
-        { title: "الجلسة 6: التعرية الرياحية", skill: "التمييز بين الأشكال البصرية", task: "نشاط: ارسم العلاقة بين اتجاه الرياح وتكون الكثبان الرملية (ص 74)." },
-        { title: "الجلسة 7: التعرية الجليدية", skill: "التفسير والوصف البصري", task: "نشاط: حلل شكل الأودية الجليدية بعد انصهار الجليد (ص 95)." },
-        { title: "الجلسة 8: التعرية البحرية", skill: "التنبؤ بالتغير البصري", task: "نشاط: ارسم كيف يتطور القوس البحري ليصبح مسلة بحرية (ص 115)." }
+    const skills = [
+        "القراءة البصرية", "التمييز البصرى", "إدراك العلاقات المكانية", 
+        "التحليل البصرى", "التفسير البصرى", "استنتاج المعنى", "التصور الذهنى"
     ];
 
-    let canvas, ctx, painting = false;
-    let undoStack = [], redoStack = [];
+    const sessionData = [
+        { name: "الزلازل", tasks: [
+            "تعرف على الأجزاء المكونة للزلزال من الرسم ص 4.",
+            "ميز بصرياً بين بؤرة الزلزال والمركز السطحي.",
+            "حدد العلاقة المكانية بين اتجاه الموجات ومركز الزلزال.",
+            "حلل الرسم التخطيطي لأجهزة الرصد (السيزموجراف).",
+            "فسر بصرياً سبب دمار بعض المناطق دون غيرها بالرسم.",
+            "استنتج القوة التدميرية بناءً على سعة الموجة بالرسم.",
+            "ارسم شكلاً تخطيطياً يوضح حركة الموجات داخل القشرة."
+        ], imgBase: "quake" },
+        { name: "البراكين", tasks: [
+            "اقرأ أجزاء المخروط البركاني الموضحة ص 18.",
+            "ميز بين أنواع اللافا (الحمضية والقاعدية) من خلال لونها وقوامها بالرسم.",
+            "أدرك العلاقة بين فوهة البركان ومدخنة الصهير.",
+            "حلل الأشكال الأرضية الناتجة عن التراكمات البركانية.",
+            "فسر سبب تنوع أشكال المخاريط البركانية بالصور.",
+            "استنتج نوع الثوران بناءً على كثافة السحب البركانية بالرسم.",
+            "ارسم تصوراً ذهنياً لبركان في مرحلة الثوران."
+        ], imgBase: "vol" },
+        { name: "الالتواءات", tasks: [
+            "تعرف على أنواع الطيات الموضحة ص 29.",
+            "ميز بين الطية المحدبة والمقعرة بصرياً.",
+            "حدد العلاقة بين قوى الضغط الجانبي وشكل الالتواء.",
+            "حلل ميل الطبقات في الطيات غير المتماثلة.",
+            "فسر بصرياً كيف تتكون الجبال الالتوائية من الرسم.",
+            "استنتج عمر الطبقات في قلب الطية المحدبة والمقعرة.",
+            "ارسم نموذجاً لثنية مركبة من وحي خيالك الجغرافي."
+        ], imgBase: "fold" },
+        { name: "الانكسارات", tasks: [
+            "اقرأ أنواع الصدوع الموضحة ص 41.",
+            "ميز بين الصدع العادي والمعكوس بالرسم.",
+            "حدد العلاقة المكانية بين حائط الصدع العلوي والسفلي.",
+            "حلل أثر الانكسار على إزاحة الطبقات الصخرية.",
+            "فسر تكون الأخدود والهورست بصرياً.",
+            "استنتج اتجاه قوى الشد أو الضغط المسببة للصدع.",
+            "ارسم تصوراً لانكسار عرضي يقطع مجرى مائي."
+        ], imgBase: "fault" },
+        { name: "التجوية", tasks: [
+            "تعرف على مظاهر التجوية الميكانيكية والكيميائية ص 55.",
+            "ميز بين أثر نمو البلورات وتقشر الصخور بصرياً.",
+            "أدرك العلاقة بين المناخ وسرعة تحلل الصخر.",
+            "حلل صورة صخر جيري تعرض للإذابة الكيميائية.",
+            "فسر تكون الكهوف الجيرية بناءً على الصور التوضيحية.",
+            "استنتج مآل الصخور الجرانيتية بعد التجوية.",
+            "ارسم شكلاً يوضح عملية تفتت الصخر بفعل التجمد."
+        ], imgBase: "weather" },
+        { name: "التعرية الهوائية", tasks: [
+            "اقرأ أشكال النحت والترسيب الرياحي ص 74.",
+            "ميز بين الكثبان الهلالية والبرخانات بصرياً.",
+            "حدد العلاقة بين اتجاه الرياح وانحدار الكثيب.",
+            "حلل صورة لموائد الصحراء وكيفية نحتها.",
+            "فسر بصرياً تدرج حبيبات الرمل في الكثبان.",
+            "استنتج سرعة الرياح من خلال تموجات الرمال بالصورة.",
+            "ارسم حقلاً من الكثبان الرملية يوضح اتجاه الرياح السائد."
+        ], imgBase: "wind" },
+        { name: "التعرية النهرية", tasks: [
+            "تعرف على مراحل النهر (الشباب، النضج، الشيخوخة) ص 95.",
+            "ميز بصرياً بين الوادي الضيق والسهل الفيضي.",
+            "أدرك العلاقة بين سرعة التيار والنحت في المنعطفات.",
+            "حلل رسم تخطيطي للدلتا وأنواعها.",
+            "فسر تكون الشلالات والجنادل بناءً على الصور.",
+            "استنتج حمل النهر (خشن/ناعم) من خلال لونه بالرسم.",
+            "ارسم قطاعاً بروفيللياً لنهر في مرحلة الشباب."
+        ], imgBase: "river" },
+        { name: "التعرية البحرية", tasks: [
+            "اقرأ أشكال الساحل (الجروف، الكهوف، الأقواس) ص 115.",
+            "ميز بين الشاطئ الرملي والجرف الصخري بصرياً.",
+            "حدد العلاقة بين قوة الأمواج وتراجع خط الساحل.",
+            "حلل صورة توضح مراحل تكون المسلات البحرية.",
+            "فسر تكون الألسنة والحواجز الرملية بصرياً.",
+            "استنتج أثر المد والجزر على شكل الشاطئ بالرسم.",
+            "ارسم تصوراً لمستقبل القوس البحري بعد تعرضه للنحت."
+        ], imgBase: "sea" }
+    ];
 
-    function openSession(index) {
+    let currentSession = 0;
+    let canvas, ctx, drawing = false;
+
+    function startSession(idx) {
+        currentSession = idx;
         document.getElementById('main-menu').style.display = 'none';
         document.getElementById('activity-screen').style.display = 'block';
-        const session = data[index];
-        document.getElementById('act-title').innerText = session.title;
-        document.getElementById('skill-badge').innerText = "مهارة: " + session.skill;
-        document.getElementById('act-instruction').innerText = session.task;
-        initCanvas();
+        document.getElementById('session-title').innerText = "الجلسة: " + sessionData[idx].name;
+        
+        const tabs = document.getElementById('skills-tabs');
+        tabs.innerHTML = "";
+        skills.forEach((s, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'skill-btn' + (i === 0 ? ' active' : '');
+            btn.innerText = s;
+            btn.onclick = () => showSkill(i);
+            tabs.appendChild(btn);
+        });
+        showSkill(0);
     }
 
-    function goBack() {
-        if(confirm("هل تريد العودة؟ تأكد من حفظ عملك أولاً.")) {
-            location.reload();
-        }
+    function showSkill(sIdx) {
+        document.querySelectorAll('.skill-btn').forEach((b, i) => {
+            b.className = 'skill-btn' + (i === sIdx ? ' active' : '');
+        });
+        
+        document.getElementById('skill-title').innerText = skills[sIdx];
+        document.getElementById('activity-task').innerText = sessionData[currentSession].tasks[sIdx];
+        document.getElementById('task-img').src = `${sessionData[currentSession].imgBase}_${sIdx}.jpg`;
+        document.getElementById('answer-box').value = "";
+
+        // إظهار المرسم فقط في مهارة التصور الذهني (الفهرس 6)
+        const isDrawing = (sIdx === 6);
+        document.getElementById('drawing-room').style.display = isDrawing ? 'block' : 'none';
+        document.getElementById('image-room').style.display = isDrawing ? 'none' : 'block';
+        
+        if(isDrawing) initCanvas();
     }
 
     function initCanvas() {
         canvas = document.getElementById('geoCanvas');
         ctx = canvas.getContext('2d');
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', finishedPosition);
-        canvas.addEventListener('mousemove', draw);
-        // Touch support
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
-        canvas.addEventListener('touchend', finishedPosition);
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        canvas.onmousedown = () => drawing = true;
+        canvas.onmouseup = () => { drawing = false; ctx.beginPath(); };
+        canvas.onmousemove = draw;
+        // Touch
+        canvas.ontouchstart = (e) => { e.preventDefault(); drawing = true; };
+        canvas.ontouchend = () => { drawing = false; ctx.beginPath(); };
+        canvas.ontouchmove = (e) => { e.preventDefault(); draw(e.touches[0]); };
     }
 
-    function startPosition(e) { painting = true; saveState(); draw(e); }
-    function finishedPosition() { painting = false; ctx.beginPath(); }
-    
     function draw(e) {
-        if (!painting) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.pageX) - rect.left;
-        const y = (e.clientY || e.pageY) - rect.top;
-        ctx.lineWidth = document.getElementById('penWidth').value;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = document.getElementById('colorPicker').value;
-        ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+        if(!drawing) return;
+        const r = canvas.getBoundingClientRect();
+        ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.strokeStyle = document.getElementById('penColor').value;
+        ctx.lineTo((e.clientX || e.pageX) - r.left, (e.clientY || e.pageY) - r.top);
+        ctx.stroke(); ctx.beginPath(); ctx.moveTo((e.clientX || e.pageX) - r.left, (e.clientY || e.pageY) - r.top);
     }
 
-    function saveState() { undoStack.push(canvas.toDataURL()); redoStack = []; }
-    function undo() { if (undoStack.length) { redoStack.push(canvas.toDataURL()); loadImg(undoStack.pop()); } }
-    function redo() { if (redoStack.length) { undoStack.push(canvas.toDataURL()); loadImg(redoStack.pop()); } }
-    function loadImg(src) { let img = new Image(); img.src = src; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); } }
-    function clearCanvas() { if(confirm("مسح اللوحة؟")) ctx.clearRect(0,0,canvas.width,canvas.height); }
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
 
-    function previewImage() {
-        document.getElementById('previewImg').src = canvas.toDataURL();
-        document.getElementById('previewText').innerText = document.getElementById('text-answer').value;
-        document.getElementById('previewModal').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-    }
-    function closePreview() { document.getElementById('previewModal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-
-    function saveAndSubmit() {
+    function saveActivity() {
+        alert("تم حفظ استجابة الطالب بنجاح! سيتم تخزينها لتحليل مهارات التفكير البصري.");
         const link = document.createElement('a');
-        link.download = `نشاط_جيومورفولوجيا_${Date.now()}.png`;
+        link.download = `Ashraf_Research_${Date.now()}.png`;
         link.href = canvas.toDataURL();
-        link.click();
-        alert("تم حفظ النشاط بنجاح! يرجى إرسال الصورة المحملة للمعلم لتقييم مهارات التفكير البصري.");
+        if(document.getElementById('drawing-room').style.display !== 'none') link.click();
     }
 </script>
 
