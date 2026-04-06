@@ -193,44 +193,83 @@
     }
 
     function initCanvas() {
-        canvas = document.getElementById('canvas'); ctx = canvas.getContext('2d');
-        canvas.width = canvas.parentElement.offsetWidth; canvas.height = 400;
-        history = []; step = -1; saveState();
-        
-        canvas.onmousedown = (e) => {
-            const r = canvas.getBoundingClientRect();
-            startX = e.clientX - r.left; startY = e.clientY - r.top;
-            if(currentTool === 'text') {
-                const txt = prompt("اكتب المصطلح العلمي:");
-                if(txt) {
-                    ctx.font = `${document.getElementById('pSize').value * 4}px Cairo`;
-                    ctx.fillStyle = document.getElementById('pColor').value;
-                    ctx.fillText(txt, startX, startY); saveState();
-                }
-            } else {
-                painting = true; snapshot = ctx.getImageData(0,0,canvas.width,canvas.height);
-                ctx.beginPath(); ctx.moveTo(startX, startY);
-            }
-        };
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = 400;
+    
+    // منع السلوك الافتراضي للمتصفح (التمرير) عند لمس الكانفاس
+    canvas.style.touchAction = 'none';
 
-        canvas.onmousemove = (e) => {
-            if(!painting || currentTool === 'text') return;
-            const r = canvas.getBoundingClientRect();
-            const x = e.clientX - r.left, y = e.clientY - r.top;
-            ctx.lineWidth = document.getElementById('pSize').value; ctx.lineCap = 'round';
-            ctx.strokeStyle = (currentTool === 'eraser') ? '#fff' : document.getElementById('pColor').value;
-
-            if(currentTool === 'brush' || currentTool === 'eraser') {
-                ctx.lineTo(x, y); ctx.stroke();
-            } else {
-                ctx.putImageData(snapshot, 0, 0);
-                if(currentTool === 'line') { ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x, y); ctx.stroke(); }
-                if(currentTool === 'rect') ctx.strokeRect(startX, startY, x - startX, y - startY);
-            }
-        };
-
-        canvas.onmouseup = () => { if(painting) { painting = false; saveState(); } };
+    function getPosition(e) {
+        const rect = canvas.getBoundingClientRect();
+        // التحقق هل هو حدث لمس أم ماوس
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: x - rect.left, y: y - rect.top };
     }
+
+    const startAction = (e) => {
+        const pos = getPosition(e);
+        startX = pos.x;
+        startY = pos.y;
+
+        if (currentTool === 'text') {
+            const txt = prompt("اكتب المصطلح العلمي:");
+            if (txt) {
+                ctx.font = `${document.getElementById('pSize').value * 4}px Cairo`;
+                ctx.fillStyle = document.getElementById('pColor').value;
+                ctx.fillText(txt, startX, startY);
+                saveState();
+            }
+        } else {
+            painting = true;
+            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+        }
+    };
+
+    const moveAction = (e) => {
+        if (!painting || currentTool === 'text') return;
+        const pos = getPosition(e);
+        const x = pos.x;
+        const y = pos.y;
+
+        ctx.lineWidth = document.getElementById('pSize').value;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = (currentTool === 'eraser') ? '#fff' : document.getElementById('pColor').value;
+
+        if (currentTool === 'brush' || currentTool === 'eraser') {
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        } else {
+            ctx.putImageData(snapshot, 0, 0);
+            if (currentTool === 'line') {
+                ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x, y); ctx.stroke();
+            }
+            if (currentTool === 'rect') {
+                ctx.strokeRect(startX, startY, x - startX, y - startY);
+            }
+        }
+    };
+
+    const endAction = () => {
+        if (painting) {
+            painting = false;
+            saveState();
+        }
+    };
+
+    // ربط كافة الأحداث (ماوس + لمس) بدقة
+    canvas.addEventListener('mousedown', startAction);
+    canvas.addEventListener('mousemove', moveAction);
+    canvas.addEventListener('mouseup', endAction);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startAction(e); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); moveAction(e); }, { passive: false });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); endAction(); }, { passive: false });
+}
 
     function saveState() { step++; if(step < history.length) history.length = step; history.push(canvas.toDataURL()); }
     function undo() { if(step > 0) { step--; let img = new Image(); img.src = history[step]; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); }; } }
