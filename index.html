@@ -193,123 +193,93 @@
     }
 
     function initCanvas() {
-    canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = 400;
-    
-    // منع السلوك الافتراضي للمتصفح (التمرير) عند لمس الكانفاس
-    canvas.style.touchAction = 'none';
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = 400;
+        canvas.style.touchAction = 'none';
 
-    function getPosition(e) {
-        const rect = canvas.getBoundingClientRect();
-        // التحقق هل هو حدث لمس أم ماوس
-        const x = e.touches ? e.touches[0].clientX : e.clientX;
-        const y = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: x - rect.left, y: y - rect.top };
+        function getPosition(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: x - rect.left, y: y - rect.top };
+        }
+
+        const startAction = (e) => {
+            const pos = getPosition(e);
+            startX = pos.x; startY = pos.y;
+            if (currentTool === 'text') {
+                const txt = prompt("اكتب المصطلح العلمي:");
+                if (txt) {
+                    ctx.font = `${document.getElementById('pSize').value * 4}px Cairo`;
+                    ctx.fillStyle = document.getElementById('pColor').value;
+                    ctx.fillText(txt, startX, startY);
+                    saveState();
+                }
+            } else {
+                painting = true;
+                snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                ctx.beginPath(); ctx.moveTo(startX, startY);
+            }
+        };
+
+        const moveAction = (e) => {
+            if (!painting || currentTool === 'text') return;
+            const pos = getPosition(e);
+            ctx.lineWidth = document.getElementById('pSize').value;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = (currentTool === 'eraser') ? '#fff' : document.getElementById('pColor').value;
+            if (currentTool === 'brush' || currentTool === 'eraser') {
+                ctx.lineTo(pos.x, pos.y); ctx.stroke();
+            } else {
+                ctx.putImageData(snapshot, 0, 0);
+                if (currentTool === 'line') { ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+                if (currentTool === 'rect') ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY);
+            }
+        };
+
+        const endAction = () => { if (painting) { painting = false; saveState(); } };
+
+        canvas.onmousedown = startAction; canvas.onmousemove = moveAction; canvas.onmouseup = endAction;
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startAction(e); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); moveAction(e); }, { passive: false });
+        canvas.addEventListener('touchend', endAction);
     }
 
-    const startAction = (e) => {
-        const pos = getPosition(e);
-        startX = pos.x;
-        startY = pos.y;
-
-        if (currentTool === 'text') {
-            const txt = prompt("اكتب المصطلح العلمي:");
-            if (txt) {
-                ctx.font = `${document.getElementById('pSize').value * 4}px Cairo`;
-                ctx.fillStyle = document.getElementById('pColor').value;
-                ctx.fillText(txt, startX, startY);
-                saveState();
-            }
-        } else {
-            painting = true;
-            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-        }
-    };
-
-    const moveAction = (e) => {
-        if (!painting || currentTool === 'text') return;
-        const pos = getPosition(e);
-        const x = pos.x;
-        const y = pos.y;
-
-        ctx.lineWidth = document.getElementById('pSize').value;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = (currentTool === 'eraser') ? '#fff' : document.getElementById('pColor').value;
-
-        if (currentTool === 'brush' || currentTool === 'eraser') {
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        } else {
-            ctx.putImageData(snapshot, 0, 0);
-            if (currentTool === 'line') {
-                ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x, y); ctx.stroke();
-            }
-            if (currentTool === 'rect') {
-                ctx.strokeRect(startX, startY, x - startX, y - startY);
-            }
-        }
-    };
-
-    const endAction = () => {
-        if (painting) {
-            painting = false;
-            saveState();
-        }
-    };
-
-    // ربط كافة الأحداث (ماوس + لمس) بدقة
-    canvas.addEventListener('mousedown', startAction);
-    canvas.addEventListener('mousemove', moveAction);
-    canvas.addEventListener('mouseup', endAction);
-
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startAction(e); }, { passive: false });
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); moveAction(e); }, { passive: false });
-    canvas.addEventListener('touchend', (e) => { e.preventDefault(); endAction(); }, { passive: false });
-}
+    function saveState() {
+        step++;
+        if (step < history.length) history.length = step;
+        history.push(canvas.toDataURL());
+    }
 
     function saveActivity() {
-    const studentName = document.getElementById('s-name').value || "طالب_مجهول";
-    const sessionName = sessData[currentS).name;
-    const skillName = skills[currentK];
-    const fileName = `${studentName}_${sessionName}_${skillName}.jpg`;
+        const studentName = document.getElementById('s-name').value || "طالب_مجهول";
+        const sessionName = sessData[currentS].name;
+        const skillName = skills[currentK];
+        const fileName = `${studentName}_${sessionName}_${skillName}.jpg`;
 
-    // 1. الجزء الخاص بحفظ الصورة على جهاز الطالب
-    const canvas = document.getElementById('canvas');
-    // تحويل الكانفاس إلى رابط بيانات بصيغة JPEG
-    const imageURL = canvas.toDataURL("image/jpeg", 1.0);
-    
-    const downloadLink = document.createElement('a');
-    downloadLink.href = imageURL;
-    downloadLink.download = fileName; // حفظ الملف باسم الطالب والجلسة
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+        const canvas = document.getElementById('canvas');
+        const imageURL = canvas.toDataURL("image/jpeg", 1.0);
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = imageURL;
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
 
-    // 2. الجزء الخاص بالإرسال للمحاضر (عبر البريد الإلكتروني)
-    const emailLecturer = "ashraf.rashad@art.svu.edu.eg"; // بريدك الأكاديمي يا دكتور
-    const subject = encodeURIComponent(`إجابة نشاط: ${sessionName} - الطالب: ${studentName}`);
-    const body = encodeURIComponent(
-        `تحية طيبة دكتور أشرف،\n\n` +
-        `مرفق طيه إجابة النشاط الخاص بي في منصة الجيومورفولوجيا.\n` +
-        `الجلسة: ${sessionName}\n` +
-        `المهارة: ${skillName}\n` +
-        `الاستجابة النصية: ${document.getElementById('stu-answer').value}\n\n` +
-        `اسم الطالب: ${studentName}\n` +
-        `المجموعة: ${document.getElementById('s-group').value}`);
+        const emailLecturer = "ashraf.rashad@art.svu.edu.eg";
+        const subject = encodeURIComponent(`إجابة نشاط: ${sessionName} - الطالب: ${studentName}`);
+        const body = encodeURIComponent(`الاسم: ${studentName}\nالمجموعة: ${document.getElementById('s-group').value}\nالجلسة: ${sessionName}\nالمهارة: ${skillName}\nالإجابة: ${document.getElementById('stu-answer').value}`);
 
-    alert("تم حفظ الرسم على جهازك بصيغة JPG. سيفتح الآن بريدك لإرساله للمحاضر.");
-    
-    // فتح برنامج البريد الإلكتروني
-    window.location.href = `mailto:${emailLecturer}?subject=${subject}&body=${body}`;
+        alert("تم حفظ الرسم JPG. سيفتح بريدك الآن.");
+        window.location.href = `mailto:${emailLecturer}?subject=${subject}&body=${body}`;
     }
+
     function undo() { if(step > 0) { step--; let img = new Image(); img.src = history[step]; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); }; } }
     function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); saveState(); }
     function toggleModel() { document.getElementById('model-text').innerText = sessData[currentS].ans[currentK]; document.getElementById('model-answer-box').style.display='block'; }
-    function saveActivity() { alert("تم حفظ العمل بنجاح."); }
     function previewDrawing() { document.getElementById('previewImg').src = canvas.toDataURL(); document.getElementById('previewModal').style.display='block'; }
     function closePreview() { document.getElementById('previewModal').style.display='none'; }
 </script>
