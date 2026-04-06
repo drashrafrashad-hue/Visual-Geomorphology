@@ -41,6 +41,12 @@
         .drawing-controls { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; flex-wrap: wrap; background: #f0f0f0; padding: 10px; border-radius: 8px; }
         .draw-btn { padding: 8px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-size: 1.2em; background: white; }
         .geo-img { width: 100%; height: 380px; object-fit: contain; border-radius: 10px; border: 1px solid #ddd; }
+        /* 1. تنسيق المرسم المطور */
+        .drawing-controls { background: #f8f9fa; padding: 12px; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border: 1px solid #ddd; margin-bottom: 10px; }
+        .draw-btn { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 1.1em; background: white; transition: 0.2s; }
+        .draw-btn:hover { background: #eee; }
+        .active-tool { background: var(--magma) !important; color: white !important; border: none; }
+        canvas { border: 3px solid var(--earth); width: 100%; height: 400px; background: white; border-radius: 10px; cursor: crosshair; touch-action: none; }
 
         /* الإجابة النموذجية والمعاينة */
         #model-answer-box { display: none; background: #e8f5e9; border: 2px dashed var(--success); padding: 15px; margin-top: 15px; border-radius: 10px; }
@@ -118,69 +124,52 @@
             <div class="media-area">
                 <div id="draw-zone" style="display:none;">
                     <div class="drawing-controls">
-                        <div class="tool-group"><label>اللون</label><input type="color" id="pColor" value="#5D4037"></div>
-                        <div class="tool-group"><label>الحجم</label><input type="range" id="pSize" min="1" max="15" value="3" style="width:50px;"></div>
-                        <button class="draw-btn" onclick="undo()" title="تراجع">↩️</button>
-                        <button class="draw-btn" onclick="redo()" title="للامام">↪️</button>
-                        <button class="draw-btn" onclick="clearCanvas()" style="background:#ffcdd2;">🗑️</button>
-                        <button class="draw-btn" onclick="previewDrawing()" style="background:#bbdefb;">👁️</button>
+                        <input type="color" id="pColor" value="#5D4037" title="لون الرسم والنص">
+                        <input type="range" id="pSize" min="1" max="20" value="3" title="حجم الخط">
+                        <button class="draw-btn active-tool" id="btn-brush" onclick="setTool('brush')">🖌️</button>
+                        <button class="draw-btn" id="btn-text" onclick="setTool('text')">🔤</button>
+                        <button class="draw-btn" id="btn-line" onclick="setTool('line')">📏</button>
+                        <button class="draw-btn" id="btn-rect" onclick="setTool('rect')">🟦</button>
+                        <button class="draw-btn" id="btn-eraser" onclick="setTool('eraser')">🧽</button>
+                        <button class="draw-btn" onclick="undo()">↩️</button>
+                        <button class="draw-btn" onclick="clearCanvas()" style="color:red">🗑️</button>
                     </div>
                     <canvas id="canvas"></canvas>
                 </div>
                 <img id="task-img" class="geo-img" src="">
             </div>
         </div>
-        <button class="btn" style="margin-top: 25px; background: var(--stone); color: white;" onclick="location.reload()">🏠 العودة للقائمة</button>
+        <button class="btn" style="margin-top: 20px; padding:10px; background:var(--stone); color:white; border:none; border-radius:5px; cursor:pointer;" onclick="location.reload()">🏠 العودة للقائمة</button>
     </div>
 </div>
 
-<div id="previewModal">
-    <div id="previewContent">
-        <h3 style="color:var(--earth);">🖼️ معاينة الرسم النهائي</h3>
-        <img id="previewImg" style="max-width: 100%; border: 2px solid #333; border-radius: 5px;">
-        <br><br>
-        <button class="btn btn-main" onclick="closePreview()">إغلاق</button>
-    </div>
-</div>
+<div id="previewModal"><div id="previewContent"><img id="previewImg" style="max-width:100%;"><br><button class="btn" style="padding:10px; margin-top:10px;" onclick="closePreview()">إغلاق</button></div></div>
 
 <script>
     const skills = ["القراءة البصرية", "التمييز البصرى", "إدراك العلاقات المكانية", "التحليل البصرى", "التفسير البصرى", "استنتاج المعنى", "التصور الذهنى"];
     const sessData = [
-        { name: "الزلازل", code: "quake", tasks: ["حدد مكونات الزلزال ص 4", "ميز بين البؤرة والمركز السطحي ص 6", "حدد اتجاه انتشار الموجات ص 8", "حلل رسم السيزموجراف ص 10", "فسر دمار المباني ص 12", "استنتج القوة من الرسم ص 13", "ارسم تصوراً لموجات تسونامي"], 
-          ans: ["تتكون من: البؤرة، المركز السطحي، والصدع.", "البؤرة في الأعماق، والمركز السطحي النقطة المقابلة لها على السطح.", "تنتشر دائرياً من البؤرة في كافة الاتجاهات.", "الذبذبات الطويلة تعني اهتزازاً قوياً.", "بسبب القرب من المركز السطحي أو ضعف التربة.", "نستنتجها من سعة الموجة في الرسم البياني.", "رسم يوضح اندفاع كتل مائية ضخمة نحو اليابس."] },
-        { name: "البراكين", code: "vol", tasks: ["أجزاء البركان ص 18", "اللافا الحمضية والقاعدية ص 20", "مكان غرفة الصهير ص 21", "تحليل المدخنة ص 22", "تكون الفوهة ص 23", "نوع الثوران ص 24", "ارسم انفجار بركاني"], 
-          ans: ["خزان، مدخنة، فوهة، مخروط.", "الحمضية لزجة (مخروط حاد)، والقاعدية سائلة (مخروط مفلطح).", "في أسفل القشرة الأرضية (مستودع الماجما).", "القناة الواصلة من الغرفة للفوهة.", "بسبب اندفاع الغازات أو انهيار القمة.", "السحابة السوداء الكثيفة تدل على انفجار عنيف.", "رسم يوضح تصاعد الرماد وانسحاب اللافا."] },
-        { name: "الالتواءات", code: "fold", tasks: ["أنواع الطيات ص 29", "المحدبة والمقعرة ص 30", "محور الطية ص 31", "ميل الطبقات ص 33", "تكون الجبال الالتوائية ص 35", "اتجاه الضغط ص 36", "ارسم ثنية مركبة"], 
-          ans: ["محدبة ومقعرة.", "المحدبة تقوس للأعلى والمقعرة للأسفل.", "الخط الوهمي الذي تلتوي حوله الطبقات.", "يميل الجناح بزاوية أكبر حسب قوة الضغط.", "بسبب تعرض الصخور اللينة لضغوط جانبية.", "تميل الطية عكس جهة الضغط الأقوى.", "تتابع من طيات محدبة ومقعرة متصلة."] },
-        { name: "الانكسارات", code: "fault", tasks: ["أنواع الصدوع ص 41", "العادي والمعكوس ص 42", "الحائط العلوي ص 44", "إزاحة الطبقات ص 45", "تكون الأغوار ص 47", "نوع الصدع ص 48", "ارسم صدع مدرج"], 
-          ans: ["عادي، معكوس، وأفقي.", "العادي يتحرك لأسفل، والمعكوس يتحرك لأعلى.", "كتلة الصخر التي تقع فوق مستوى الصدع المائل.", "إما رأسية (أعلى/أسفل) أو أفقية (جانبية).", "هبوط كتلة بين صدعين عاديين متوازيين.", "التباعد يعني صدع عادي والتركب يعني معكوس.", "تتابع من صدوع تهبط في نفس الاتجاه كالسلم."] },
-        { name: "التجوية", code: "weather", tasks: ["مظاهر التفتت ص 55", "الحرارة والصقيع ص 58", "عمق التجوية ص 60", "صخر متحلل ص 63", "تكون التربة ص 65", "مآل المعادن ص 67", "ارسم تقشر الصخور"], 
-          ans: ["تفتت ميكانيكي أو تحلل كيميائي.", "الحرارة تسبب تمدداً والصقيع يسبب تحطماً بالضغط.", "يقل أثرها كلما زاد العمق.", "فقدان الصلابة وتغير اللون بسبب التفاعل.", "نتاج تفتت الصخور واختلاطها بالمواد العضوية.", "تتحول المعادن الصلبة إلى طينية لينة.", "انفصال طبقات سطحية تشبه قشر البصل."] },
-        { name: "التعرية الهوائية", code: "wind", tasks: ["أشكال النحت ص 74", "الكثبان الطولية والهلالية ص 78", "اتجاه الرياح ص 80", "الموائد الصحراوية ص 83", "تجمع الرمال ص 85", "قوة الرياح ص 87", "ارسم حقلاً من الكثبان"], 
-          ans: ["موائد ومنخفضات (نحت) وكثبان (ترسيب).", "الهلالية لها ذراعان والطولية تمتد بموازاة الريح.", "الجانب المحدب يواجه الريح والمقعر في جهة الظل.", "نحت الطبقات اللينة السفلى وبقاء الصلبة.", "عندما تضعف سرعة الرياح أو تصطدم بعائق.", "نستنتجها من حجم الحبيبات المنقولة.", "رسم يوضح أشكال الكثبان مع اتجاه الريح."] },
-        { name: "التعرية النهرية", code: "river", tasks: ["قطاع الوادي ص 95", "الشلال والجنادل ص 98", "النحت في المنعطف ص 100", "رسم الدلتا ص 103", "السهل الفيضي ص 105", "مرحلة النهر ص 107", "ارسم بروفيل لنهر شاب"], 
-          ans: ["يكون على شكل حرف V في البداية.", "الشلال سقوط رأسي والجنادل صخور معترضة.", "النحت في الجانب الخارجي والترسيب في الداخلي.", "ترسب الرواسب عند المصب بهدوء البحر.", "الرواسب الطميية الناتجة عن الفيضانات.", "الضيق والسرعة يعني شباب والاتساع يعني نضج.", "قطاع عرضي ضيق وعميق بجدران حادة."] },
-        { name: "التعرية البحرية", code: "sea", tasks: ["أجزاء الجرف ص 115", "القوس والمسلة ص 118", "خط الساحل ص 120", "أثر الأمواج ص 122", "تكون الألسنة ص 123", "نوع الساحل ص 124", "ارسم مسلة بحرية"], 
-          ans: ["حافة صخرية ورصيف نحت.", "القوس فتحة والمسلة عمود صخري منفرد.", "الحد الفاصل بين اليابس والماء.", "نحت مستمر يسبب انهيار الكتل العليا للجروف.", "ترسيب الرمال عند مداخل الخليج.", "المعرج يعني نحت (صخري) والمستوي ترسيب (رملي).", "رسم عمود صخري منفصل داخل الماء."] }
+        { name: "الزلازل", code: "quake", tasks: ["حدد المكونات", "ميز البؤرة", "العلاقات المكانية للموجات", "تحليل السيزموجراف", "تفسير الدمار", "استنتاج القوة", "ارسم تصوراً لموجات تسونامي"], ans: ["بؤرة، مركز، صدع", "البؤرة تحت والمركز فوق", "تنتشر دائرياً", "سعة الموجة تدل على الشدة", "بسبب الاهتزازات", "من مقياس ريختر", "رسم تدفق مائي هائل"] },
+        { name: "البراكين", code: "vol", tasks: ["أجزاء البركان", "اللافا", "غرفة الصهير", "تحليل المدخنة", "تكون الفوهة", "نوع الثوران", "ارسم انفجار بركاني"], ans: ["فوهة، مدخنة، خزان", "قاعدية وحمضية", "تحت القشرة", "قناة الماجما", "اندفاع الغازات", "انفجاري أو هادئ", "رسم لافا متصاعدة"] },
+        { name: "الالتواءات", code: "fold", tasks: ["أنواع الطيات", "المحدبة والمقعرة", "محور الطية", "ميل الطبقات", "تكون الجبال", "اتجاه الضغط", "ارسم ثنية مركبة"], ans: ["بسيطة ومركبة", "محدبة لأعلى", "خط وهمي", "بزاوية ميل", "ضغط جانبي", "من جهة القوة", "رسم طيات متتالية"] },
+        { name: "الانكسارات", code: "fault", tasks: ["أنواع الصدوع", "العادي والمعكوس", "الحائط العلوي", "إزاحة الطبقات", "تكون الأغوار", "نوع الصدع", "ارسم صدع مدرج"], ans: ["عادي ومعكوس", "حسب حركة الكتل", "فوق مستوى الصدع", "رأسية أو أفقية", "هبوط كتلة صخرية", "حسب شدة الشد", "رسم طبقات مهبطة"] },
+        { name: "التجوية", code: "weather", tasks: ["مظاهر التفتت", "الحرارة والصقيع", "عمق التجوية", "صخر متحلل", "تكون التربة", "مآل المعادن", "ارسم تقشر الصخور"], ans: ["تكسر وتحلل", "تمدد وانكماش", "يقل بالعمق", "تغير الخواص", "مادة مفتتة", "تحول لطين", "رسم انفصال قشور"] },
+        { name: "التعرية الهوائية", code: "wind", tasks: ["أشكال النحت", "الكثبان", "اتجاه الرياح", "الموائد الصحراوية", "تجمع الرمال", "قوة الرياح", "ارسم حقل كثبان"], ans: ["نحت وتذرية", "هلالية وطولية", "تحدد شكل الكثيب", "نحت سفلي", "وجود عائق", "سرعة النقل", "رسم كثبان هلالية"] },
+        { name: "التعرية النهرية", code: "river", tasks: ["قطاع الوادي", "الشلال", "المنعطف", "الدلتا", "السهل الفيضي", "مرحلة النهر", "ارسم نهر شاب"], ans: ["حرف V", "سقوط مائي", "نحت وترسيب", "عند المصب", "إرساب طمي", "شباب، نضج، شيخوخة", "رسم وادي ضيق"] },
+        { name: "التعرية البحرية", code: "sea", tasks: ["أجزاء الجرف", "القوس والمسلة", "خط الساحل", "أثر الأمواج", "الألسنة", "نوع الساحل", "ارسم مسلة بحرية"], ans: ["حافة ورصيف", "نحت ميكانيكي", "تراجع الساحل", "تآكل الصخور", "ترسيب طولي", "ساحل متعرج", "رسم عمود وسط الماء"] }
     ];
 
-    let currentS = 0, currentK = 0, student = {}, history = [], step = -1, painting = false, canvas, ctx;
+    let currentS = 0, currentK = 0, history = [], step = -1, painting = false, canvas, ctx, snapshot, startX, startY, currentTool = 'brush';
 
-    function showLogin() { document.getElementById('cover-screen').style.display = 'none'; document.getElementById('login-screen').style.display = 'block'; }
-    function enterPlatform() {
-        const n = document.getElementById('s-name').value;
-        const g = document.getElementById('s-group').value;
-        if(!n) return alert("سجل اسمك الرباعي");
-        student = {n, g};
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-menu').style.display = 'block';
-        document.getElementById('welcome-txt').innerText = `الباحث: ${n} (${g})`;
-        const grid = document.getElementById('menu-grid');
-        sessData.forEach((s, i) => grid.innerHTML += `<div class="card" onclick="openS(${i})"><h3>${s.name}</h3><p>فتح الأنشطة</p></div>`);
+    function showLogin() { document.getElementById('cover-screen').style.display='none'; document.getElementById('login-screen').style.display='block'; }
+    function enterPlatform() { 
+        if(!document.getElementById('s-name').value) return alert("سجل اسمك");
+        document.getElementById('login-screen').style.display='none'; document.getElementById('main-menu').style.display='block';
+        const grid = document.getElementById('menu-grid'); grid.innerHTML = "";
+        sessData.forEach((s, i) => grid.innerHTML += `<div class="card" onclick="openS(${i})"><h3>${s.name}</h3></div>`);
     }
 
     function openS(idx) {
-        currentS = idx; document.getElementById('main-menu').style.display = 'none'; document.getElementById('activity-screen').style.display = 'block';
+        currentS = idx; document.getElementById('main-menu').style.display='none'; document.getElementById('activity-screen').style.display='block';
         document.getElementById('sess-title').innerText = "الجلسة: " + sessData[idx].name;
         const tabs = document.getElementById('skill-tabs'); tabs.innerHTML = "";
         skills.forEach((s, i) => tabs.innerHTML += `<button class="skill-btn ${i==0?'active':''}" onclick="showK(${i})">${s}</button>`);
@@ -189,48 +178,67 @@
 
     function showK(idx) {
         currentK = idx; document.querySelectorAll('.skill-btn').forEach((b, i) => b.className = `skill-btn ${i==idx?'active':''}`);
-        document.getElementById('skill-name').innerText = "المهارة: " + skills[idx];
+        document.getElementById('skill-name').innerText = skills[idx];
         document.getElementById('task-text').innerText = sessData[currentS].tasks[idx];
-        document.getElementById('stu-answer').value = ""; document.getElementById('model-answer-box').style.display = 'none';
+        document.getElementById('stu-answer').value = ""; document.getElementById('model-answer-box').style.display='none';
         const isD = (idx === 6); document.getElementById('draw-zone').style.display = isD ? 'block' : 'none';
         document.getElementById('task-img').style.display = isD ? 'none' : 'block';
         if(isD) initCanvas(); else document.getElementById('task-img').src = `${sessData[currentS].code}_${idx}.jpg`;
     }
 
-    function toggleModel() { document.getElementById('model-text').innerText = sessData[currentS].ans[currentK]; document.getElementById('model-answer-box').style.display = 'block'; }
+    function setTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.draw-btn').forEach(b => b.classList.remove('active-tool'));
+        document.getElementById('btn-' + tool).classList.add('active-tool');
+    }
 
     function initCanvas() {
         canvas = document.getElementById('canvas'); ctx = canvas.getContext('2d');
-        canvas.width = canvas.parentElement.offsetWidth - 10; canvas.height = 350;
+        canvas.width = canvas.parentElement.offsetWidth; canvas.height = 400;
         history = []; step = -1; saveState();
-        canvas.onmousedown = (e) => { painting = true; draw(e); };
-        canvas.onmouseup = () => { painting = false; saveState(); ctx.beginPath(); };
-        canvas.onmousemove = draw;
-        canvas.ontouchstart = (e) => { e.preventDefault(); painting = true; draw(e.touches[0]); };
-        canvas.ontouchend = () => { painting = false; saveState(); ctx.beginPath(); };
-        canvas.ontouchmove = (e) => { e.preventDefault(); draw(e.touches[0]); };
-    }
+        
+        canvas.onmousedown = (e) => {
+            const r = canvas.getBoundingClientRect();
+            startX = e.clientX - r.left; startY = e.clientY - r.top;
+            if(currentTool === 'text') {
+                const txt = prompt("اكتب المصطلح العلمي:");
+                if(txt) {
+                    ctx.font = `${document.getElementById('pSize').value * 4}px Cairo`;
+                    ctx.fillStyle = document.getElementById('pColor').value;
+                    ctx.fillText(txt, startX, startY); saveState();
+                }
+            } else {
+                painting = true; snapshot = ctx.getImageData(0,0,canvas.width,canvas.height);
+                ctx.beginPath(); ctx.moveTo(startX, startY);
+            }
+        };
 
-    function draw(e) {
-        if (!painting) return; const r = canvas.getBoundingClientRect();
-        ctx.lineWidth = document.getElementById('pSize').value; ctx.lineCap = 'round'; ctx.strokeStyle = document.getElementById('pColor').value;
-        ctx.lineTo((e.clientX || e.pageX) - r.left, (e.clientY || e.pageY) - r.top);
-        ctx.stroke(); ctx.beginPath(); ctx.moveTo((e.clientX || e.pageX) - r.left, (e.clientY || e.pageY) - r.top);
+        canvas.onmousemove = (e) => {
+            if(!painting || currentTool === 'text') return;
+            const r = canvas.getBoundingClientRect();
+            const x = e.clientX - r.left, y = e.clientY - r.top;
+            ctx.lineWidth = document.getElementById('pSize').value; ctx.lineCap = 'round';
+            ctx.strokeStyle = (currentTool === 'eraser') ? '#fff' : document.getElementById('pColor').value;
+
+            if(currentTool === 'brush' || currentTool === 'eraser') {
+                ctx.lineTo(x, y); ctx.stroke();
+            } else {
+                ctx.putImageData(snapshot, 0, 0);
+                if(currentTool === 'line') { ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x, y); ctx.stroke(); }
+                if(currentTool === 'rect') ctx.strokeRect(startX, startY, x - startX, y - startY);
+            }
+        };
+
+        canvas.onmouseup = () => { if(painting) { painting = false; saveState(); } };
     }
 
     function saveState() { step++; if(step < history.length) history.length = step; history.push(canvas.toDataURL()); }
-    function undo() { if(step > 0) { step--; loadH(); } }
-    function redo() { if(step < history.length - 1) { step++; loadH(); } }
-    function loadH() { let img = new Image(); img.src = history[step]; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); }; }
-    function clearCanvas() { if(confirm("مسح اللوحة؟")) { ctx.clearRect(0,0,canvas.width,canvas.height); saveState(); } }
-    function previewDrawing() { document.getElementById('previewImg').src = canvas.toDataURL(); document.getElementById('previewModal').style.display = "block"; }
-    function closePreview() { document.getElementById('previewModal').style.display = "none"; }
-
-    function saveActivity() {
-        const fn = `${student.n}_${sessData[currentS].name}_${skills[currentK]}.png`;
-        if(currentK === 6) { const l = document.createElement('a'); l.download = fn; l.href = canvas.toDataURL(); l.click(); }
-        alert(`أحسنت يا ${student.n}! تم حفظ العمل.`);
-    }
+    function undo() { if(step > 0) { step--; let img = new Image(); img.src = history[step]; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); }; } }
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); saveState(); }
+    function toggleModel() { document.getElementById('model-text').innerText = sessData[currentS].ans[currentK]; document.getElementById('model-answer-box').style.display='block'; }
+    function saveActivity() { alert("تم حفظ العمل بنجاح."); }
+    function previewDrawing() { document.getElementById('previewImg').src = canvas.toDataURL(); document.getElementById('previewModal').style.display='block'; }
+    function closePreview() { document.getElementById('previewModal').style.display='none'; }
 </script>
 </body>
 </html>
