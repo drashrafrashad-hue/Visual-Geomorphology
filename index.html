@@ -271,7 +271,40 @@
     canvas.addEventListener('touchend', (e) => { e.preventDefault(); endAction(); }, { passive: false });
 }
 
-    function saveState() { step++; if(step < history.length) history.length = step; history.push(canvas.toDataURL()); }
+    function saveActivity() {
+    const studentName = document.getElementById('s-name').value || "طالب_مجهول";
+    const sessionName = sessData[currentS).name;
+    const skillName = skills[currentK];
+    const fileName = `${studentName}_${sessionName}_${skillName}.jpg`;
+
+    // 1. الجزء الخاص بحفظ الصورة على جهاز الطالب
+    const canvas = document.getElementById('canvas');
+    // تحويل الكانفاس إلى رابط بيانات بصيغة JPEG
+    const imageURL = canvas.toDataURL("image/jpeg", 1.0);
+    
+    const downloadLink = document.createElement('a');
+    downloadLink.href = imageURL;
+    downloadLink.download = fileName; // حفظ الملف باسم الطالب والجلسة
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // 2. الجزء الخاص بالإرسال للمحاضر (عبر البريد الإلكتروني)
+    const emailLecturer = "ashraf.rashad@art.svu.edu.eg"; // بريدك الأكاديمي يا دكتور
+    const subject = encodeURIComponent(`إجابة نشاط: ${sessionName} - الطالب: ${studentName}`);
+    const body = encodeURIComponent(
+        `تحية طيبة دكتور أشرف،\n\n` +
+        `مرفق طيه إجابة النشاط الخاص بي في منصة الجيومورفولوجيا.\n` +
+        `الجلسة: ${sessionName}\n` +
+        `المهارة: ${skillName}\n` +
+        `الاستجابة النصية: ${document.getElementById('stu-answer').value}\n\n` +
+        `اسم الطالب: ${studentName}\n` +
+        `المجموعة: ${document.getElementById('s-group').value}`);
+
+    alert("تم حفظ الرسم على جهازك بصيغة JPG. سيفتح الآن بريدك لإرساله للمحاضر.");
+    
+    // فتح برنامج البريد الإلكتروني
+    window.location.href = `mailto:${emailLecturer}?subject=${subject}&body=${body}`;}
     function undo() { if(step > 0) { step--; let img = new Image(); img.src = history[step]; img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); }; } }
     function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); saveState(); }
     function toggleModel() { document.getElementById('model-text').innerText = sessData[currentS].ans[currentK]; document.getElementById('model-answer-box').style.display='block'; }
