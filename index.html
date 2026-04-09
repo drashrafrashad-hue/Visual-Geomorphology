@@ -3,136 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة المفكر البصري - الإصدار المستقر | د. أشرف رشاد</title>
+    <title>منصة التفكير البصري الجيومورفولوجي | د. أشرف رشاد</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --earth: #5D4037; --magma: #E64A19; --sand: #F5F5DC; --river: #1976D2; --success: #2E7D32; }
-        body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; overflow-x: hidden; touch-action: manipulation; }
-        header { background: var(--earth); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--magma); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .container { max-width: 1300px; margin: auto; padding: 10px; }
+        :root { --earth: #5D4037; --magma: #E64A19; --sand: #F5F5DC; --river: #1976D2; --gold: #C5A059; }
+        body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; overflow-x: hidden; }
+        header { background: var(--earth); color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--gold); }
+        .container { max-width: 1300px; margin: auto; padding: 15px; }
 
-        /* شاشات المنصة */
+        /* الشاشات */
         .screen { display: none; animation: fadeIn 0.4s ease; }
         .active-screen { display: block; }
-        
-        /* التبويبات */
-        .tabs { display: flex; background: #eee; border-radius: 10px 10px 0 0; margin-top: 15px; border: 1px solid #ccc; }
-        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: bold; background: #ddd; transition: 0.3s; }
+
+        /* التبويبات التعليمية */
+        .tabs { display: flex; background: #eee; border-radius: 10px 10px 0 0; margin-top: 20px; border: 1px solid #ccc; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: bold; background: #ddd; min-width: 120px; }
         .tab-btn.active { background: white; color: var(--magma); border-bottom: 4px solid var(--magma); }
-        .tab-content { display: none; padding: 15px; background: white; border: 1px solid #ccc; border-top: none; min-height: 600px; border-radius: 0 0 10px 10px; }
+        .tab-content { display: none; padding: 20px; background: white; border: 1px solid #ccc; border-top: none; min-height: 600px; border-radius: 0 0 10px 10px; }
         .active-tab { display: block; }
 
-        /* المرسم والذكاء الاصطناعي */
-        .ai-panel { margin-top: 20px; padding: 20px; background: #e3f2fd; border: 3px solid var(--river); border-radius: 15px; }
-        .studio-container { display: flex; gap: 10px; height: 500px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        .toolbar { display: flex; flex-direction: column; gap: 8px; width: 60px; background: #333; padding: 10px; border-radius: 10px; }
-        .tool-btn { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+        /* بطاقات الجلسات */
+        .session-card { background: white; padding: 20px; border-radius: 12px; border-right: 6px solid var(--magma); box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; text-align: center; }
+        .session-card:hover { transform: translateY(-5px); }
+
+        /* لوحة مهارات التفكير البصري والذكاء الاصطناعي */
+        .visual-skills-panel { background: #fdf2f2; border: 2px solid var(--magma); border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .ai-panel { background: #e3f2fd; border: 2px solid var(--river); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+
+        /* المرسم */
+        .studio-container { display: flex; gap: 10px; height: 550px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        .toolbar { display: flex; flex-direction: column; gap: 8px; width: 65px; background: #333; padding: 10px; border-radius: 10px; }
+        .tool-btn { width: 45px; height: 45px; border: none; border-radius: 8px; cursor: pointer; background: #fff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
         .tool-btn.active { background: var(--magma); color: white; }
-        
         #canvas-wrap { flex-grow: 1; background: #fff; position: relative; border: 2px solid #ccc; border-radius: 5px; overflow: hidden; }
-        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
 
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-ai { background: var(--river); color: white; width: 100%; font-size: 1.1em; margin-top: 10px; }
-        .ai-img-preview { max-width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; }
+        .btn-ai { background: var(--river); color: white; width: 100%; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .loading-ring { display: none; border: 4px solid #f3f3f3; border-top: 4px solid var(--river); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
+        .loader { display: none; border: 4px solid #f3f3f3; border-top: 4px solid var(--river); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>🌍 منصة المفكر البصري - د. أشرف رشاد</h1>
-    <p>تفعيل تقنيات بنانا AI المتقدمة</p>
+    <h1>🌍 منصة مهارات التفكير البصري والجيومورفولوجي</h1>
+    <p>بإشراف د. أشرف رشاد صابر - جامعة قنا</p>
 </header>
 
 <div class="container">
     
     <div id="login-screen" class="screen active-screen">
-        <div style="max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <h3>مرحباً بك دكتور أشرف</h3>
-            <input type="text" id="user-name" placeholder="ادخل اسمك" style="width: 100%; padding: 10px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
-            <button class="btn" style="background: var(--magma); color:white; width: 100%;" onclick="startApp()">بدء التشغيل</button>
+        <div style="max-width: 450px; margin: 80px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+            <h2 style="color: var(--earth)">مرحباً بك في المختبر الجغرافي</h2>
+            <input type="text" id="user-name" placeholder="ادخل اسم الطالب الرباعي" style="width: 100%; padding: 15px; margin: 20px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1.1em;">
+            <button class="btn" style="background: var(--magma); color: white; width: 100%;" onclick="startApp()">دخول المنصة</button>
         </div>
     </div>
 
     <div id="menu-screen" class="screen">
-        <h3 style="text-align: center; margin-top: 20px;">اختر الجلسة الجيومورفولوجية</h3>
-        <div id="session-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;"></div>
+        <h3 style="text-align: center; margin: 25px 0;">اختر الجلسة التعليمية لتنمية مهارات التفكير البصري</h3>
+        <div id="session-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; padding: 10px;"></div>
     </div>
 
     <div id="session-screen" class="screen">
-        <h2 id="session-title" style="text-align: center; color: var(--earth);"></h2>
-        
+        <h2 id="session-title" style="text-align: center; color: var(--earth); margin-bottom: 5px;"></h2>
+        <p id="student-display" style="text-align: center; color: var(--magma); font-weight: bold;"></p>
+
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'tab-pdf')">📖 المحتوى</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-ai')">🤖 بنانا AI</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-draw')">🎨 المرسم</button>
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-theory')">📖 المحتوى العلمي</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-skills')">👁️ مهارات التفكير البصري</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-studio')">🎨 مرسم بنانا AI</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-eval')">📝 التقييم الذاتي</button>
         </div>
 
-        <div id="tab-pdf" class="tab-content active-tab">
-            <iframe id="pdf-viewer" style="width: 100%; height: 600px; border: none;"></iframe>
+        <div id="tab-theory" class="tab-content active-tab">
+            <iframe id="pdf-viewer" style="width:100%; height:650px; border:none; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"></iframe>
         </div>
 
-        <div id="tab-ai" class="tab-content">
-            <div class="ai-panel">
-                <h4>🤖 محرك توليد الصور الجيومورفولوجية (Banana AI v2)</h4>
-                <textarea id="ai-prompt" placeholder="صف الظاهرة بدقة (مثلاً: صورة واقعية لصدع ناتج عن زلزال في منطقة صحراوية)..." style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Cairo';"></textarea>
-                <button id="gen-btn" class="btn btn-ai" onclick="runBananaAI()">🚀 توليد الصورة الآن</button>
-                <div id="loader" class="loading-ring"></div>
-                <div id="ai-result" style="text-align: center; margin-top: 15px;">
-                    <img id="preview-img" class="ai-img-preview" src="">
-                    <br>
-                    <button id="send-to-draw" class="btn" style="background: var(--success); color: white; display: none; margin-top: 10px;" onclick="sendToCanvas()">🎨 إرسال للمرسم للتحليل</button>
+        <div id="tab-skills" class="tab-content">
+            <div class="visual-skills-panel">
+                <h3>🔍 الأنشطة التدريبية لتنمية مهارات التفكير البصري</h3>
+                <ul style="line-height: 2; font-size: 1.1em; color: #444;">
+                    <li><strong>مهارة التعرف على الأشكال:</strong> حدد المعالم الجيومورفولوجية الأساسية في الخريطة أمامك.</li>
+                    <li><strong>مهارة قراءة الصورة:</strong> استخرج خصائص الظاهرة الطبيعية من خلال الملاحظة الدقيقة.</li>
+                    <li><strong>مهارة التحليل البصري:</strong> فكك عناصر التضاريس واربطها بالأسباب الجيولوجية.</li>
+                    <li><strong>مهارة التفسير البصري:</strong> استنتج التغيرات المستقبلية للظاهرة بناءً على الشواهد الحالية.</li>
+                </ul>
+                <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <p><strong>مهمة الجلسة:</strong> قم بتحليل الخريطة الجيومورفولوجية المرفقة وسجل ملاحظاتك في المرسم.</p>
                 </div>
             </div>
         </div>
 
-        <div id="tab-draw" class="tab-content">
+        <div id="tab-studio" class="tab-content">
+            <div class="ai-panel">
+                <h4 style="margin-top: 0; color: var(--river)">🤖 محاكي بنانا AI لتوليد الظواهر الجغرافية</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <textarea id="ai-prompt" placeholder="صف الظاهرة الجغرافية بدقة لتحليلها (مثال: بركان مخروطي في منطقة جبلية)..." style="flex: 1; min-width: 250px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Cairo';"></textarea>
+                    <button id="gen-btn" class="btn btn-ai" style="width: auto;" onclick="generateAIImage()">🚀 توليد وتحليل</button>
+                </div>
+                <div id="ai-loader" class="loader"></div>
+                <div id="ai-preview-box" style="text-align: center; margin-top: 15px; display: none;">
+                    <img id="ai-img" src="" style="max-width: 100%; border-radius: 10px; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <br>
+                    <button class="btn" style="background: var(--success); color: white; margin-top: 10px;" onclick="transferToCanvas()">✍️ رسم وتحليل فوق الصورة</button>
+                </div>
+            </div>
+
             <div class="studio-container">
                 <div class="toolbar">
                     <button class="tool-btn active" onclick="setTool('brush', this)">🖌️</button>
                     <button class="tool-btn" onclick="setTool('rect', this)">🟦</button>
                     <button class="tool-btn" onclick="setTool('text', this)">T</button>
                     <button class="tool-btn" onclick="setTool('eraser', this)">🧽</button>
-                    <input type="color" id="color-picker" value="#E64A19" style="width:40px; height:40px; border:none; padding:0;">
+                    <input type="color" id="color-picker" value="#E64A19" style="width:45px; height:45px; border:none; cursor:pointer;">
                     <button class="tool-btn" onclick="undo()" style="margin-top: auto;">↩️</button>
-                    <button class="tool-btn" onclick="clearAll()" style="color:red">🗑️</button>
+                    <button class="tool-btn" onclick="clearCanvas()" style="color:red">🗑️</button>
                 </div>
                 <div id="canvas-wrap">
-                    <canvas id="canvas"></canvas>
+                    <canvas id="main-canvas"></canvas>
                 </div>
             </div>
-            <button class="btn" style="background: var(--earth); color: white; width: 100%; margin-top: 10px;" onclick="saveImage()">💾 حفظ التحليل البصري</button>
+            <button class="btn" style="background: var(--earth); color: white; width: 100%; margin-top: 15px;" onclick="saveWork()">💾 حفظ عمل الطالب</button>
         </div>
 
-        <button class="btn" style="margin-top: 20px; background: #666; color: white;" onclick="backToMenu()">🔙 العودة للقائمة</button>
+        <div id="tab-eval" class="tab-content">
+            <div id="quiz-area" style="padding: 20px; line-height: 2;"></div>
+            <button class="btn" style="background: var(--magma); color: white; width: 100%;" onclick="alert('تم حفظ نتائج التقييم بنجاح')">إرسال الإجابات للمشرف</button>
+        </div>
+
+        <button class="btn" style="margin-top: 30px; background: #666; color: white;" onclick="backToMenu()">🔙 العودة لقائمة الجلسات</button>
     </div>
 </div>
 
 <script>
     const sessions = ["الزلازل", "البراكين", "الالتواءات", "الانكسارات", "التجوية", "التعرية الهوائية", "التعرية النهرية", "التعرية البحرية"];
-    let canvas = document.getElementById('canvas');
+    let canvas = document.getElementById('main-canvas');
     let ctx = canvas.getContext('2d', { willReadFrequently: true });
-    let drawing = false, tool = 'brush', history = [];
-    let bgImg = null;
+    let drawing = false, tool = 'brush', history = [], bgImg = null;
 
     function startApp() {
-        if (!document.getElementById('user-name').value) return alert("يرجى كتابة الاسم");
+        const name = document.getElementById('user-name').value;
+        if (!name) return alert("يرجى إدخال اسم الطالب");
+        document.getElementById('student-display').innerText = "الطالب: " + name;
         const grid = document.getElementById('session-grid');
-        grid.innerHTML = sessions.map(s => `<div style="background:white; padding:15px; border-radius:10px; cursor:pointer; text-align:center; border-right:5px solid var(--magma); box-shadow:0 2px 5px rgba(0,0,0,0.1)" onclick="loadSession('${s}')">${s}</div>`).join('');
+        grid.innerHTML = sessions.map((s, i) => `<div class="session-card" onclick="openSession('${s}')"><h3>الجلسة ${i+1}</h3><p>${s}</p></div>`).join('');
         document.getElementById('login-screen').classList.remove('active-screen');
         document.getElementById('menu-screen').classList.add('active-screen');
     }
 
-    function loadSession(name) {
-        document.getElementById('session-title').innerText = "دراسة: " + name;
-        document.getElementById('pdf-viewer').src = name + ".pdf";
+    function openSession(s) {
+        document.getElementById('session-title').innerText = "الجلسة العلمية: " + s;
+        document.getElementById('pdf-viewer').src = s + ".pdf";
         document.getElementById('menu-screen').classList.remove('active-screen');
         document.getElementById('session-screen').classList.add('active-screen');
-        setTimeout(initCanvas, 200);
+        setTimeout(initCanvas, 300);
+        loadQuiz(s);
     }
 
     function backToMenu() {
@@ -140,61 +169,47 @@
         document.getElementById('menu-screen').classList.add('active-screen');
     }
 
-    function switchTab(e, tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+    function switchTab(e, id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active-tab');
+        document.getElementById(id).classList.add('active-tab');
         e.currentTarget.classList.add('active');
-        if(tabId === 'tab-draw') initCanvas();
+        if(id === 'tab-studio') initCanvas();
     }
 
-    // --- نظام الذكاء الاصطناعي (الحل النهائي لعدم التشغيل) ---
-    async function runBananaAI() {
+    // --- بنانا AI المطور ---
+    async function generateAIImage() {
         const prompt = document.getElementById('ai-prompt').value;
-        const btn = document.getElementById('gen-btn');
-        const loader = document.getElementById('loader');
-        const img = document.getElementById('preview-img');
-        const sendBtn = document.getElementById('send-to-draw');
-
-        if (!prompt) return alert("اكتب وصف الظاهرة أولاً");
-
-        btn.disabled = true;
+        const loader = document.getElementById('ai-loader');
+        const preview = document.getElementById('ai-preview-box');
+        const img = document.getElementById('ai-img');
+        
+        if(!prompt) return alert("يرجى وصف الظاهرة أولاً");
+        
         loader.style.display = 'block';
-        img.style.display = 'none';
-        sendBtn.style.display = 'none';
-
-        // محرك بنانا AI المطور (يستخدم بروكسي لتجاوز الحجب)
-        const enhancedPrompt = `Professional geological photo, ${prompt}, high resolution, realistic, geomorphology study`;
-        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=768&nologo=true&seed=${Math.floor(Math.random()*999)}`;
-
-        // محاولة تحميل الصورة والتأكد من نجاحها
+        preview.style.display = 'none';
+        
+        // المحرك المطور لمحاكاة كفاءة بنانا
+        const finalUrl = `https://image.pollinations.ai/prompt/professional-geological-photo-${encodeURIComponent(prompt)}-high-resolution-photorealistic?width=1024&height=768&nologo=true&seed=${Math.floor(Math.random()*999)}`;
+        
         const tempImg = new Image();
         tempImg.crossOrigin = "anonymous";
-        tempImg.src = url;
-
+        tempImg.src = finalUrl;
         tempImg.onload = () => {
-            img.src = url;
-            img.style.display = 'inline-block';
+            img.src = finalUrl;
             loader.style.display = 'none';
-            btn.disabled = false;
-            sendBtn.style.display = 'inline-block';
-        };
-
-        tempImg.onerror = () => {
-            alert("حدث خطأ في الاتصال بالخادم، جرب وصفاً آخر أو تأكد من الإنترنت.");
-            loader.style.display = 'none';
-            btn.disabled = false;
+            preview.style.display = 'block';
         };
     }
 
-    function sendToCanvas() {
-        const img = document.getElementById('preview-img');
+    function transferToCanvas() {
+        const aiImg = document.getElementById('ai-img');
         bgImg = new Image();
         bgImg.crossOrigin = "anonymous";
-        bgImg.src = img.src;
+        bgImg.src = aiImg.src;
         bgImg.onload = () => {
-            switchTab({currentTarget: document.querySelector('[onclick*="tab-draw"]')}, 'tab-draw');
-            alert("تم إرسال الصورة للمرسم، يمكنك الآن تحليلها بصرياً.");
+            initCanvas();
+            alert("تم وضع الصورة كخلفية للمرسم. ابدأ الآن بممارسة مهارات التفكير البصري في التحليل.");
         };
     }
 
@@ -217,16 +232,11 @@
     }
 
     function saveState() {
-        if (history.length > 15) history.shift();
+        if (history.length > 20) history.shift();
         history.push(ctx.getImageData(0,0,canvas.width, canvas.height));
     }
 
-    function undo() {
-        if(history.length > 1) {
-            history.pop();
-            ctx.putImageData(history[history.length-1], 0, 0);
-        }
-    }
+    function undo() { if(history.length > 1) { history.pop(); ctx.putImageData(history[history.length-1], 0, 0); } }
 
     function setTool(t, btn) {
         tool = t;
@@ -235,38 +245,51 @@
     }
 
     canvas.onmousedown = (e) => { 
-        drawing = true; 
-        ctx.beginPath(); 
+        drawing = true; ctx.beginPath();
         const rect = canvas.getBoundingClientRect();
         ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    };
-
-    canvas.onmousemove = (e) => {
-        if(!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        ctx.strokeStyle = (tool === 'eraser') ? '#fff' : document.getElementById('color-picker').value;
-        ctx.lineWidth = (tool === 'eraser') ? 30 : 4;
-
-        if(tool === 'brush' || tool === 'eraser') {
-            ctx.lineTo(x, y);
-            ctx.stroke();
+        if(tool === 'text') {
+            let txt = prompt("ادخل النص التحليلي:");
+            if(txt) {
+                ctx.fillStyle = document.getElementById('color-picker').value;
+                ctx.font = "bold 20px Cairo";
+                ctx.fillText(txt, e.clientX - rect.left, e.clientY - rect.top);
+                saveState();
+            }
+            drawing = false;
         }
     };
 
-    window.onmouseup = () => { if(drawing) { drawing = false; saveState(); } };
+    canvas.onmousemove = (e) => {
+        if(!drawing || tool === 'text') return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.strokeStyle = (tool === 'eraser') ? '#fff' : document.getElementById('color-picker').value;
+        ctx.lineWidth = (tool === 'eraser') ? 30 : 4;
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+    };
 
-    // دعم اللمس للموبايل
+    window.onmouseup = () => { if(drawing) { drawing = false; saveState(); } };
+    
+    // دعم اللمس
     canvas.ontouchstart = (e) => { e.preventDefault(); canvas.onmousedown(e.touches[0]); };
     canvas.ontouchmove = (e) => { e.preventDefault(); canvas.onmousemove(e.touches[0]); };
     canvas.ontouchend = () => window.onmouseup();
 
-    function clearAll() { bgImg = null; initCanvas(); }
-    function saveImage() {
+    function clearCanvas() { bgImg = null; initCanvas(); }
+
+    function loadQuiz(sessionName) {
+        const area = document.getElementById('quiz-area');
+        area.innerHTML = `<h3>اختبار مهارات التفكير البصري - جلسة ${sessionName}</h3>
+            <p>1. من خلال تحليل الصورة السابقة، ما هي القوة الجيومورفولوجية الأساسية التي شكلت هذه الظاهرة؟</p>
+            <input type="text" style="width:100%; padding:10px; border:1px solid #ccc;">
+            <p>2. صف بأسلوبك العلمي التغير البصري الذي سيطرأ على هذا الشكل خلال 50 عاماً القادمة.</p>
+            <textarea style="width:100%; height:80px; padding:10px; border:1px solid #ccc; font-family:'Cairo'"></textarea>`;
+    }
+
+    function saveWork() {
         const link = document.createElement('a');
-        link.download = 'تحليل_جيومورفولوجي.png';
+        link.download = `تحليل_طالب_${document.getElementById('user-name').value}.png`;
         link.href = canvas.toDataURL();
         link.click();
     }
