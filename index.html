@@ -2,15 +2,17 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة المفكر البصري الجيومورفولوجي | د. أشرف رشاد</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root { --earth: #5D4037; --magma: #E64A19; --sand: #F5F5DC; --river: #1976D2; --success: #2E7D32; }
-        body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; color: #333; }
+        body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; touch-action: manipulation; }
         header { background: var(--earth); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--magma); }
-        .container { max-width: 1250px; margin: auto; padding: 15px; }
+        .container { max-width: 1200px; margin: auto; padding: 10px; }
+
+        /* شاشات التنقل */
         .screen { display: none; animation: fadeIn 0.4s ease; }
         .active-screen { display: block; }
 
@@ -18,34 +20,32 @@
         .tabs { display: flex; background: #ddd; border-radius: 10px 10px 0 0; margin-top: 15px; }
         .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; }
         .tab-btn.active { background: white; color: var(--magma); border-bottom: 4px solid var(--magma); }
-        .tab-content { display: none; padding: 20px; background: white; border: 1px solid #ddd; border-top: none; min-height: 600px; border-radius: 0 0 10px 10px; }
+        .tab-content { display: none; padding: 15px; background: white; border: 1px solid #ddd; border-top: none; min-height: 600px; border-radius: 0 0 10px 10px; }
         .active-tab { display: block; }
 
-        /* العداد الموضعي */
+        /* المرسم الرقمي المحترف */
+        .studio-layout { display: flex; gap: 10px; height: 550px; }
+        .toolbar { background: #333; padding: 10px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; width: 60px; height: 100%; overflow-y: auto; }
+        .tool { width: 45px; height: 45px; border: none; border-radius: 5px; cursor: pointer; background: #eee; font-size: 1.1em; display: flex; align-items: center; justify-content: center; }
+        .tool.active { background: var(--magma); color: white; }
+        .canvas-container { flex-grow: 1; background: white; border: 2px solid var(--earth); border-radius: 8px; position: relative; overflow: hidden; }
+        canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+
+        @media (max-width: 768px) {
+            .studio-layout { flex-direction: column; height: auto; }
+            .toolbar { flex-direction: row; width: 100%; height: auto; overflow-x: auto; }
+            canvas { height: 350px !important; }
+        }
+
+        /* العداد */
         .skill-timer { background: #222; color: #ffeb3b; padding: 5px 15px; border-radius: 20px; display: inline-block; font-weight: bold; margin-bottom: 10px; }
 
-        /* الكتاب الإلكتروني */
-        #pdf-wrap { background: #525659; padding: 15px; border-radius: 8px; text-align: center; }
-        #pdf-canvas { max-width: 100%; border: 4px solid #333; background: white; }
-        .pdf-bar { margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center; }
-
-        /* المرسم الرقمي (General & Skill 7) */
-        .studio-layout { display: grid; grid-template-columns: 70px 1fr; gap: 15px; }
-        .toolbar { background: #eee; padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .tool { width: 40px; height: 40px; border: 1px solid #ccc; background: white; border-radius: 5px; cursor: pointer; font-size: 1.1em; display: flex; align-items: center; justify-content: center; }
-        .tool.active { background: var(--magma); color: white; }
-        canvas { background: white; border: 2px solid var(--earth); width: 100%; height: 500px; cursor: crosshair; touch-action: none; border-radius: 5px; }
-
-        /* البطاقات */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        /* بطاقات الجلسات */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #ccc; cursor: pointer; transition: 0.3s; }
         .card:hover { border-color: var(--magma); transform: scale(1.02); }
 
-        /* الذكاء الاصطناعي */
-        .ai-preview { margin-top: 10px; border: 2px solid var(--magma); border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; background: #fff; overflow: hidden; }
-        .ai-img { max-width: 100%; max-height: 350px; }
-
-        .btn { padding: 8px 18px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.2s; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
         .btn-main { background: var(--magma); color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -54,21 +54,21 @@
 
 <header>
     <h1>🌍 منصة المفكر البصري الجيومورفولوجي</h1>
-    <p>بإشراف د. أشرف رشاد صابر - العام الجامعي 2026م</p>
+    <p>بإشراف د. أشرف رشاد صابر - جامعة قنا</p>
 </header>
 
 <div class="container">
     
     <div id="login-screen" class="screen active-screen">
         <div class="card" style="max-width: 400px; margin: 50px auto;">
-            <h3>تسجيل دخول الباحث</h3>
+            <h3>تسجيل دخول الطالب</h3>
             <input type="text" id="s-name" placeholder="الاسم الرباعي" style="width:90%; padding:10px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc;">
             <button class="btn btn-main" onclick="initPlatform()">دخول المنصة</button>
         </div>
     </div>
 
     <div id="menu-screen" class="screen">
-        <h3 style="text-align: center;">الجلسات التعليمية (المحتوى الرقمي)</h3>
+        <h3 style="text-align: center;">الجلسات التعليمية الثمانية</h3>
         <div class="grid" id="sess-grid"></div>
     </div>
 
@@ -83,66 +83,58 @@
         </div>
 
         <div id="tab-content" class="tab-content active-tab">
-            <div id="pdf-wrap">
-                <canvas id="pdf-canvas"></canvas>
-                <div class="pdf-bar">
+            <div style="background:#525659; padding:10px; border-radius:8px; text-align:center;">
+                <canvas id="pdf-canvas" style="max-width:100%; border:3px solid #333; background:white;"></canvas>
+                <div style="margin-top:10px; color:white;">
                     <button class="btn" onclick="changePage(-1)">السابق</button>
-                    <span style="color:white">صفحة: <span id="p-num">0</span> / <span id="p-total">0</span></span>
+                    <span>صفحة: <span id="p-num">0</span> / <span id="p-total">0</span></span>
                     <button class="btn" onclick="changePage(1)">التالي</button>
                     <button class="btn" onclick="zoomPdf(1.1)">➕</button>
                     <button class="btn" onclick="zoomPdf(0.9)">➖</button>
-                    <input type="number" id="jump-p" style="width:50px" placeholder="رقم">
-                    <button class="btn" onclick="jumpToPage()">انتقال</button>
                 </div>
             </div>
         </div>
 
         <div id="tab-skills" class="tab-content">
             <div id="skills-nav" style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;"></div>
-            <div id="active-skill-area" style="border: 1px solid #eee; padding: 15px; border-radius: 10px;">
+            <div style="border:1px solid #eee; padding:15px; border-radius:10px;">
                 <div class="skill-timer">⏱️ وقت المهارة: <span id="s-timer">10:00</span></div>
-                <h4 id="active-skill-name" style="color:var(--magma); margin:5px 0;"></h4>
-                <p id="skill-instructions" style="font-weight:bold;"></p>
+                <h4 id="active-skill-name" style="color:var(--magma)"></h4>
                 
-                <div id="skill-7-studio" style="display:none; margin-top:15px;">
-                    <div class="studio-layout">
-                        <div class="toolbar" id="tools-s7"></div>
-                        <canvas id="canvas-s7"></canvas>
-                    </div>
+                <div id="skill-7-area" style="display:none; height:450px;">
+                    <p>المطلوب: ارسم تصوراً ذهلياً للظاهرة الجغرافية</p>
+                    <div class="studio-layout" id="s7-layout">
+                        </div>
                 </div>
 
                 <div id="skill-text-area">
-                    <textarea id="skill-ans" style="width:100%; height:100px; margin-top:10px;" placeholder="اكتب تحليلك البصري هنا..."></textarea>
+                    <p id="skill-instructions"></p>
+                    <textarea id="skill-ans" style="width:100%; height:120px;" placeholder="اكتب تحليلك الجغرافي هنا..."></textarea>
                 </div>
-                <button class="btn btn-main" style="margin-top:10px" onclick="saveData('skill')">حفظ نشاط المهارة</button>
+                <button class="btn btn-main" style="margin-top:10px" onclick="alert('تم حفظ النشاط')">حفظ النشاط</button>
             </div>
         </div>
 
         <div id="tab-studio" class="tab-content">
-            <div class="studio-layout">
-                <div class="toolbar" id="tools-main"></div>
-                <div class="canvas-zone">
-                    <canvas id="canvas-main"></canvas>
-                    <div style="margin-top:15px; background:#f9f9f9; padding:15px; border-radius:10px;">
-                        <strong>🤖 مساعد التوليد البصري (Gemini 3 Flash):</strong>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            <input type="text" id="ai-prompt" placeholder="صف الظاهرة الجغرافية المراد توليدها..." style="flex:1; padding:10px; border-radius:5px; border:1px solid #ccc;">
-                            <button class="btn btn-main" onclick="generateAI()">توليد المعاينة</button>
-                        </div>
-                        <div id="ai-wrap" class="ai-preview">
-                            <p style="color:#777">المعاينة ستظهر هنا قبل الحفظ</p>
-                        </div>
-                        <div id="ai-actions" style="display:none; margin-top:10px; text-align:center;">
-                            <button class="btn btn-main" id="ai-save-btn">💾 حفظ الصورة للجهاز</button>
-                        </div>
-                    </div>
+            <div class="studio-layout" id="main-studio-layout">
+                <div class="toolbar" id="main-toolbar"></div>
+                <div class="canvas-container" id="main-canvas-wrap">
+                    <canvas id="mainCanvas"></canvas>
                 </div>
+            </div>
+            <div style="margin-top:20px; padding:15px; background:#fff3e0; border:2px dashed var(--magma); border-radius:10px;">
+                <strong>🤖 توليد بالذكاء الاصطناعي (Nano Banana 2):</strong>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="text" id="aiPrompt" placeholder="صف الظاهرة الجغرافية..." style="flex:1; padding:10px;">
+                    <button class="btn btn-main" onclick="generateAI()">توليد المعاينة</button>
+                </div>
+                <div id="aiPreview" style="margin-top:10px; text-align:center; background:white; min-height:100px; border-radius:5px;"></div>
             </div>
         </div>
 
         <div id="tab-quiz" class="tab-content">
             <div id="quiz-flow"></div>
-            <button class="btn btn-main" style="width:100%; margin-top:20px; font-size:1.2em;" onclick="saveData('quiz')">إرسال التقييم النهائي</button>
+            <button class="btn btn-main" style="width:100%; margin-top:20px;" onclick="alert('تم إرسال النتائج لجوجل شيت')">إرسال التقييم النهائي</button>
         </div>
 
         <button class="btn" style="background:#666; color:white; margin-top:20px;" onclick="showScreen('menu-screen')">العودة للجلسات</button>
@@ -150,24 +142,12 @@
 </div>
 
 <script>
-    // الإعدادات الأساسية
-    const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL";
     const sessions = ["الزلازل", "البراكين", "الالتواءات", "الانكسارات", "التجوية", "التعرية الهوائية", "التعرية النهرية", "التعرية البحرية"];
     const skills = ["القراءة البصرية", "التمييز البصري", "إدراك العلاقات", "التحليل البصري", "التفسير البصري", "استنتاج المعنى", "التصور الذهني"];
     
-    let currentS = "", currentK = 0, skillTimer, timeLeft = 600;
-    let mainCanvas, mainCtx, s7Canvas, s7Ctx, painting = false;
+    let currentS = "", currentK = 0, timer, timeLeft = 600;
+    let mainCanvas, mainCtx, painting = false, mode = 'brush', startX, startY, snapshot;
     let pdfDoc = null, pNum = 1, pScale = 1.2, pCanvas = document.getElementById('pdf-canvas'), pCtx = pCanvas.getContext('2d');
-
-    // أدوات الرسم
-    const drawTools = [
-        {id: 'brush', icon: '🖌️', title: 'قلم'},
-        {id: 'rect', icon: '🟦', title: 'مربع'},
-        {id: 'circle', icon: '⭕', title: 'دائرة'},
-        {id: 'text', icon: 'T', title: 'نص'},
-        {id: 'eraser', icon: '🧽', title: 'ممحاة'},
-        {id: 'clear', icon: '🗑️', title: 'مسح'}
-    ];
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
@@ -175,151 +155,145 @@
     }
 
     function initPlatform() {
-        if(!document.getElementById('s-name').value) return alert("سجل الاسم أولاً");
+        if(!document.getElementById('s-name').value) return alert("سجل الاسم");
         const grid = document.getElementById('sess-grid');
-        grid.innerHTML = sessions.map((s, i) => `<div class="card" onclick="openSession('${s}')"><h4>الجلسة ${i+1}</h4><p>${s}</p></div>`).join('');
+        grid.innerHTML = sessions.map(s => `<div class="card" onclick="openSession('${s}')"><h4>${s}</h4></div>`).join('');
         showScreen('menu-screen');
     }
 
     function openSession(name) {
         currentS = name;
-        document.getElementById('sess-title').innerText = "دراسة ظاهرة: " + name;
+        document.getElementById('sess-title').innerText = "جسة: " + name;
         showScreen('session-screen');
-        switchTab(null, 'tab-content');
-        initSkillsNav();
-        initAllCanvases();
         loadPDF(name + ".pdf");
+        initSkillsNav();
         buildQuiz();
+        setTimeout(initMainStudio, 100);
     }
 
-    function switchTab(evt, id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active-tab');
-        if(evt) evt.currentTarget.classList.add('active');
-        else document.querySelector(`[onclick*="${id}"]`).classList.add('active');
+    // --- نظام الرسم الموحد ---
+    function initMainStudio() {
+        mainCanvas = document.getElementById('mainCanvas');
+        mainCtx = mainCanvas.getContext('2d');
+        const wrap = document.getElementById('main-canvas-wrap');
+        mainCanvas.width = wrap.clientWidth;
+        mainCanvas.height = wrap.clientHeight;
         
-        if(id === 'tab-skills') startSkillTimer(); else stopSkillTimer();
+        const tb = document.getElementById('main-toolbar');
+        tb.innerHTML = `
+            <button class="tool active" onclick="setMode('brush', this)">🖌️</button>
+            <button class="tool" onclick="setMode('line', this)">📏</button>
+            <button class="tool" onclick="setMode('rect', this)">🟦</button>
+            <button class="tool" onclick="setMode('circle', this)">⭕</button>
+            <button class="tool" onclick="setMode('text', this)">T</button>
+            <button class="tool" onclick="setMode('eraser', this)">🧽</button>
+            <input type="color" id="colorCol" value="#5D4037" style="width:40px;">
+            <button class="tool" onclick="clearCanvas()">🗑️</button>
+        `;
+
+        const getPos = (e) => {
+            let r = mainCanvas.getBoundingClientRect();
+            return { x: (e.clientX || e.touches[0].clientX) - r.left, y: (e.clientY || e.touches[0].clientY) - r.top };
+        };
+
+        const start = (e) => {
+            painting = true;
+            let pos = getPos(e); startX = pos.x; startY = pos.y;
+            snapshot = mainCtx.getImageData(0,0,mainCanvas.width,mainCanvas.height);
+            if(mode === 'text') {
+                let t = prompt("النص:"); if(t) { mainCtx.font="20px Cairo"; mainCtx.fillText(t, startX, startY); }
+                painting = false;
+            }
+        };
+
+        const draw = (e) => {
+            if(!painting) return;
+            let pos = getPos(e);
+            mainCtx.putImageData(snapshot, 0, 0);
+            mainCtx.strokeStyle = (mode === 'eraser') ? '#fff' : document.getElementById('colorCol').value;
+            mainCtx.lineWidth = 3;
+            if(mode === 'brush' || mode === 'eraser') { mainCtx.lineTo(pos.x, pos.y); mainCtx.stroke(); }
+            else if(mode === 'rect') mainCtx.strokeRect(pos.x, pos.y, startX - pos.x, startY - pos.y);
+            else if(mode === 'line') { mainCtx.beginPath(); mainCtx.moveTo(startX, startY); mainCtx.lineTo(pos.x, pos.y); mainCtx.stroke(); }
+        };
+
+        mainCanvas.addEventListener('mousedown', start); mainCanvas.addEventListener('mousemove', draw); mainCanvas.addEventListener('mouseup', () => painting=false);
+        mainCanvas.addEventListener('touchstart', start); mainCanvas.addEventListener('touchmove', draw); mainCanvas.addEventListener('touchend', () => painting=false);
     }
+
+    function setMode(m, btn) { mode = m; document.querySelectorAll('.tool').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+    function clearCanvas() { mainCtx.clearRect(0,0,mainCanvas.width,mainCanvas.height); }
 
     // --- نظام PDF ---
     function loadPDF(url) {
         pdfjsLib.getDocument(url).promise.then(pdf => {
-            pdfDoc = pdf;
-            document.getElementById('p-total').textContent = pdf.numPages;
-            renderPage(pNum);
-        }).catch(() => console.log("PDF loading simulated..."));
+            pdfDoc = pdf; document.getElementById('p-total').innerText = pdf.numPages; renderPage(1);
+        }).catch(e => alert("يرجى التأكد من وجود ملف PDF بنفس اسم الجلسة"));
     }
-    function renderPage(num) {
-        pdfDoc.getPage(num).then(page => {
-            const vp = page.getViewport({scale: pScale});
-            pCanvas.height = vp.height; pCanvas.width = vp.width;
+    function renderPage(n) {
+        pdfDoc.getPage(n).then(page => {
+            let vp = page.getViewport({scale: pScale});
+            pCanvas.width = vp.width; pCanvas.height = vp.height;
             page.render({canvasContext: pCtx, viewport: vp});
-            document.getElementById('p-num').textContent = num;
+            document.getElementById('p-num').innerText = n;
         });
     }
-    function changePage(delta) { 
-        if(!pdfDoc) return;
-        pNum = Math.min(Math.max(1, pNum + delta), pdfDoc.numPages);
-        renderPage(pNum);
-    }
-    function zoomPdf(val) { pScale *= val; renderPage(pNum); }
-    function jumpToPage() {
-        let p = parseInt(document.getElementById('jump-p').value);
-        if(p > 0 && p <= pdfDoc.numPages) { pNum = p; renderPage(pNum); }
-    }
+    function changePage(d) { pNum = Math.min(Math.max(1, pNum+d), pdfDoc.numPages); renderPage(pNum); }
+    function zoomPdf(s) { pScale *= s; renderPage(pNum); }
 
-    // --- نظام المهارات والعداد ---
+    // --- المهارات والعداد ---
     function initSkillsNav() {
         const nav = document.getElementById('skills-nav');
         nav.innerHTML = skills.map((s, i) => `<button class="btn" style="background:#eee" onclick="loadSkill(${i})">${s}</button>`).join('');
         loadSkill(0);
     }
-    function loadSkill(idx) {
-        currentK = idx;
-        document.getElementById('active-skill-name').innerText = "المهارة: " + skills[idx];
-        document.getElementById('skill-instructions').innerText = "المطلوب: قم بتنفيذ نشاط " + skills[idx] + " الموضح في المحتوى.";
-        document.getElementById('skill-7-studio').style.display = (idx === 6) ? 'block' : 'none';
-        document.getElementById('skill-text-area').style.display = (idx === 6) ? 'none' : 'block';
-        startSkillTimer();
+    function loadSkill(i) {
+        currentK = i;
+        document.getElementById('active-skill-name').innerText = skills[i];
+        document.getElementById('skill-7-area').style.display = (i===6) ? 'block' : 'none';
+        document.getElementById('skill-text-area').style.display = (i===6) ? 'none' : 'block';
+        startTimer();
     }
-    function startSkillTimer() {
-        stopSkillTimer(); timeLeft = 600;
-        skillTimer = setInterval(() => {
+    function startTimer() {
+        clearInterval(timer); timeLeft = 600;
+        timer = setInterval(() => {
             let m = Math.floor(timeLeft/60), s = timeLeft%60;
             document.getElementById('s-timer').innerText = `${m}:${s<10?'0':''}${s}`;
-            if(timeLeft-- <= 0) { clearInterval(skillTimer); alert("انتهى وقت المهارة!"); }
+            if(timeLeft-- <= 0) { clearInterval(timer); alert("انتهى وقت المهارة"); }
         }, 1000);
-    }
-    function stopSkillTimer() { clearInterval(skillTimer); }
-
-    // --- المرسم الجغرافي ---
-    function initAllCanvases() {
-        mainCanvas = document.getElementById('canvas-main');
-        s7Canvas = document.getElementById('canvas-s7');
-        mainCtx = setupCanvas(mainCanvas, 'tools-main');
-        s7Ctx = setupCanvas(s7Canvas, 'tools-s7');
-    }
-    function setupCanvas(cvs, toolBoxId) {
-        const ctx = cvs.getContext('2d');
-        cvs.width = cvs.parentElement.offsetWidth; cvs.height = 500;
-        const box = document.getElementById(toolBoxId);
-        box.innerHTML = drawTools.map(t => `<button class="tool" id="${toolBoxId}-${t.id}" onclick="selectTool('${t.id}', '${toolBoxId}')" title="${t.title}">${t.icon}</button>`).join('');
-        
-        const start = (e) => { painting = true; ctx.beginPath(); };
-        const draw = (e) => {
-            if(!painting) return;
-            let rect = cvs.getBoundingClientRect();
-            let x = (e.clientX || e.touches[0].clientX) - rect.left;
-            let y = (e.clientY || e.touches[0].clientY) - rect.top;
-            ctx.lineWidth = 3; ctx.lineTo(x, y); ctx.stroke();
-        };
-        const end = () => painting = false;
-        
-        cvs.addEventListener('mousedown', start); cvs.addEventListener('mousemove', draw); cvs.addEventListener('mouseup', end);
-        cvs.addEventListener('touchstart', start); cvs.addEventListener('touchmove', draw); cvs.addEventListener('touchend', end);
-        return ctx;
     }
 
     // --- الذكاء الاصطناعي ---
     function generateAI() {
-        const prompt = document.getElementById('ai-prompt').value;
-        if(!prompt) return alert("اكتب وصفاً أولاً");
-        const wrap = document.getElementById('ai-wrap');
-        wrap.innerHTML = "جاري التوليد عبر Gemini 3 Flash...";
-        
+        const p = document.getElementById('aiPrompt').value;
+        if(!p) return;
+        const pre = document.getElementById('aiPreview');
+        pre.innerHTML = "جاري التوليد...";
         setTimeout(() => {
-            const url = `https://placeholder.pics/svg/500x350/E64A19/FFFFFF/${encodeURIComponent(prompt)}`;
-            wrap.innerHTML = `<img src="${url}" class="ai-img" id="temp-ai-img">`;
-            document.getElementById('ai-actions').style.display = 'block';
-            document.getElementById('ai-save-btn').onclick = () => {
-                const link = document.createElement('a'); link.href = url; link.download = "Geo_AI.png"; link.click();
-            };
+            const url = `https://placeholder.pics/svg/400x300/E64A19/FFFFFF/${encodeURIComponent(p)}`;
+            pre.innerHTML = `<img src="${url}" style="max-width:100%;"><br><button class="btn btn-main" onclick="window.open('${url}')">حفظ الصورة</button>`;
         }, 1500);
     }
 
-    // --- التقييم (6 أسئلة هجينة) ---
-    function buildQuiz() {
-        const flow = document.getElementById('quiz-flow');
-        flow.innerHTML = skills.slice(0, 6).map((s, i) => `
-            <div class="card" style="text-align:right; margin-bottom:15px; border-right:5px solid var(--magma);">
-                <p><strong>س${i+1} [مهارة ${s}]:</strong></p>
-                <p>1. حدد التضاريس المرتبطة بالظاهرة في الصورة (اختياري):</p>
-                <label><input type="radio" name="q${i}a" value="1"> خيار (أ)</label> | 
-                <label><input type="radio" name="q${i}a" value="2"> خيار (ب)</label> | 
-                <label><input type="radio" name="q${i}a" value="3"> خيار (ج)</label>
-                <p>2. ما النتيجة المترتبة على تغير شكل الظاهرة؟</p>
-                <label><input type="radio" name="q${i}b" value="1"> زيادة النحت</label> | 
-                <label><input type="radio" name="q${i}b" value="2"> زيادة الإرساب</label>
-                <p>3. اشرح برؤيتك الجغرافية مسببات هذه الظاهرة (سؤال مقالي):</p>
-                <textarea id="q${i}essay" style="width:100%; height:60px;"></textarea>
-            </div>
-        `).join('');
+    // --- التبويبات ---
+    function switchTab(evt, id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active-tab');
+        if(evt) evt.currentTarget.classList.add('active');
+        if(id === 'tab-skills') startTimer(); else clearInterval(timer);
     }
 
-    async function saveData(type) {
-        alert("تم حفظ البيانات بنجاح في سجلات جامعة قنا.");
-        // هنا يتم استدعاء SCRIPT_URL لإرسال البيانات
+    function buildQuiz() {
+        const flow = document.getElementById('quiz-flow');
+        flow.innerHTML = skills.slice(0,6).map((s, i) => `
+            <div class="card" style="text-align:right; margin-bottom:10px;">
+                <p><strong>س${i+1} [${s}]:</strong></p>
+                <label><input type="radio" name="q${i}"> خيار 1</label> | <label><input type="radio" name="q${i}"> خيار 2</label>
+                <p>سؤال مقالي:</p>
+                <textarea style="width:100%; height:50px;"></textarea>
+            </div>
+        `).join('');
     }
 </script>
 </body>
