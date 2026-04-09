@@ -124,15 +124,60 @@
                 </div>
             </div>
 
-            <div class="ai-panel">
-                <h4>🤖 مساعد الرسم بالذكاء الاصطناعي (Nano Banana 2)</h4>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <input type="text" id="ai-prompt" placeholder="صف الظاهرة الجغرافية (مثلاً: مجرى نهري متعرج)..." style="flex:1; padding:12px; border-radius:5px; border:1px solid #ccc;">
-                    <button class="btn btn-main" onclick="generateAI()">توليد الظاهرة</button>
-                </div>
-                <div id="ai-result" style="margin-top:20px; text-align:center;"></div>
-            </div>
-        </div>
+           async function generateGeomorphicImage() {
+    const promptInput = document.getElementById('ai-prompt');
+    const genBtn = document.getElementById('generate-btn');
+    const resultArea = document.getElementById('ai-result-area');
+    const imgPreview = document.getElementById('ai-img-preview');
+
+    if (!promptInput.value) return alert("من فضلك صف الظاهرة الجغرافية أولاً");
+
+    // 1. تهيئة الواجهة (تأثيرات بصرية احترافية)
+    genBtn.innerText = "⏳ جاري التوليد بدقة عالية...";
+    genBtn.disabled = true;
+    resultArea.style.display = 'block';
+    imgPreview.style.opacity = '0.3'; // تعتيم أثناء التحميل
+
+    // 2. إعداد الطلب (هنا نستخدم الـ API المتقدم)
+    // ملاحظة: استبدل الرابط أدناه برابط الـ API الخاص ببنانا أو الاستضافة الخاصة بك
+    const API_URL = "https://api.banana-ai.com/v1/generate"; 
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_SECRET_TOKEN' // توضع هنا الشفرة الخاصة بك
+            },
+            body: JSON.stringify({
+                prompt: `High-resolution geographical photo of ${promptInput.value}, photorealistic, 8k, highly detailed, geological accuracy`,
+                negative_prompt: "blurry, cartoon, low quality, text, watermark",
+                width: 1024,
+                height: 768
+            })
+        });
+
+        // 3. معالجة النتيجة
+        const data = await response.json();
+        // نفترض أن الاستجابة تعيد رابط الصورة في data.output_url
+        const finalImageUrl = data.output_url || `https://image.pollinations.ai/prompt/${encodeURIComponent(promptInput.value)}?width=1024&height=768&nologo=true`;
+
+        // 4. عرض الصورة المولدة بكفاءة
+        imgPreview.src = finalImageUrl;
+        imgPreview.onload = () => {
+            imgPreview.style.opacity = '1';
+            genBtn.innerText = "🚀 توليد ظاهرة جديدة";
+            genBtn.disabled = false;
+            document.getElementById('analyze-btn').disabled = false;
+            alert("تم توليد الصورة بنجاح! يمكنك الآن تحليلها في المرسم.");
+        };
+
+    } catch (error) {
+        console.error("خطأ في الاتصال:", error);
+        genBtn.innerText = "🚀 حاول مرة أخرى";
+        genBtn.disabled = false;
+    }
+}
 
         <div id="tab-quiz" class="tab-content">
             <div id="quiz-container"></div>
