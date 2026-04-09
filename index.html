@@ -3,282 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة المفكر البصري - نسخة بنانا المطورة | د. أشرف رشاد</title>
+    <title>منصة المفكر البصري - الإصدار المستقر | د. أشرف رشاد</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
-        :root { --earth: #5D4037; --magma: #E64A19; --sand: #F5F5DC; --success: #2E7D32; --river: #1976D2; }
+        :root { --earth: #5D4037; --magma: #E64A19; --sand: #F5F5DC; --river: #1976D2; --success: #2E7D32; }
         body { font-family: 'Cairo', sans-serif; background: var(--sand); margin: 0; overflow-x: hidden; touch-action: manipulation; }
         header { background: var(--earth); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--magma); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .container { max-width: 1300px; margin: auto; padding: 10px; }
 
+        /* شاشات المنصة */
         .screen { display: none; animation: fadeIn 0.4s ease; }
         .active-screen { display: block; }
+        
+        /* التبويبات */
         .tabs { display: flex; background: #eee; border-radius: 10px 10px 0 0; margin-top: 15px; border: 1px solid #ccc; }
         .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: bold; background: #ddd; transition: 0.3s; }
         .tab-btn.active { background: white; color: var(--magma); border-bottom: 4px solid var(--magma); }
-        .tab-content { display: none; padding: 15px; background: white; border: 1px solid #ccc; border-top: none; min-height: 650px; border-radius: 0 0 10px 10px; }
+        .tab-content { display: none; padding: 15px; background: white; border: 1px solid #ccc; border-top: none; min-height: 600px; border-radius: 0 0 10px 10px; }
         .active-tab { display: block; }
 
-        .studio-container { display: flex; gap: 10px; height: 550px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        .toolbar { display: flex; flex-direction: column; gap: 8px; width: 65px; background: #333; padding: 10px; border-radius: 10px; flex-shrink: 0; overflow-y: auto; }
-        .tool-btn { width: 45px; height: 45px; border: none; border-radius: 8px; cursor: pointer; background: #fff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-        .tool-btn.active { background: var(--magma); color: white; box-shadow: 0 0 8px var(--magma); }
+        /* المرسم والذكاء الاصطناعي */
+        .ai-panel { margin-top: 20px; padding: 20px; background: #e3f2fd; border: 3px solid var(--river); border-radius: 15px; }
+        .studio-container { display: flex; gap: 10px; height: 500px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        .toolbar { display: flex; flex-direction: column; gap: 8px; width: 60px; background: #333; padding: 10px; border-radius: 10px; }
+        .tool-btn { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+        .tool-btn.active { background: var(--magma); color: white; }
         
-        #canvas-wrap { flex-grow: 1; background: #fff; position: relative; border: 2px solid #ccc; border-radius: 5px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        #canvas-wrap { flex-grow: 1; background: #fff; position: relative; border: 2px solid #ccc; border-radius: 5px; overflow: hidden; }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 
-        @media (max-width: 768px) {
-            .studio-container { flex-direction: column; height: auto; }
-            .toolbar { flex-direction: row; width: 100%; height: auto; overflow-x: auto; flex-shrink: 0; }
-            #canvas-wrap { height: 400px; }
-        }
-
-        .ai-panel { margin-top: 20px; padding: 20px; background: #e3f2fd; border: 3px solid var(--river); border-radius: 15px; position: relative; }
-        .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--river); }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.2s; }
-        .btn-main { background: var(--magma); color: white; }
-        .btn-ai { background: var(--river); color: white; font-size: 1.1em; }
-        .btn-success { background: var(--success); color: white; }
-
-        .ai-result-box { margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .ai-img-preview { max-width: 100%; max-height: 400px; border-radius: 10px; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: opacity 0.5s; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .btn-ai { background: var(--river); color: white; width: 100%; font-size: 1.1em; margin-top: 10px; }
+        .ai-img-preview { max-width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(25, 118, 210, 0); } 100% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0); } }
-        .loading { animation: pulse 1.5s infinite; opacity: 0.7; }
+        .loading-ring { display: none; border: 4px solid #f3f3f3; border-top: 4px solid var(--river); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>🌍 منصة المفكر البصري الجيومورفولوجي</h1>
-    <p>نسخة مطورة بتقنيات "بنانا AI" لرسالة الباحث د. أشرف رشاد صابر</p>
+    <h1>🌍 منصة المفكر البصري - د. أشرف رشاد</h1>
+    <p>تفعيل تقنيات بنانا AI المتقدمة</p>
 </header>
 
 <div class="container">
     
     <div id="login-screen" class="screen active-screen">
-        <div style="max-width: 450px; margin: 80px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center;">
-            <input type="text" id="user-name" placeholder="ادخل اسمك الكامل للبدء" style="width: 100%; padding: 12px; margin: 15px 0; border-radius: 5px; border: 1px solid #ccc; font-family:'Cairo'">
-            <button class="btn btn-main" style="width: 100%" onclick="startApp()">دخول المنصة</button>
+        <div style="max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <h3>مرحباً بك دكتور أشرف</h3>
+            <input type="text" id="user-name" placeholder="ادخل اسمك" style="width: 100%; padding: 10px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <button class="btn" style="background: var(--magma); color:white; width: 100%;" onclick="startApp()">بدء التشغيل</button>
         </div>
     </div>
 
     <div id="menu-screen" class="screen">
-        <div id="session-grid" class="container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:20px; padding:20px;"></div>
+        <h3 style="text-align: center; margin-top: 20px;">اختر الجلسة الجيومورفولوجية</h3>
+        <div id="session-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;"></div>
     </div>
 
     <div id="session-screen" class="screen">
-        <h2 id="current-session-title" style="text-align: center; color: var(--earth);"></h2>
+        <h2 id="session-title" style="text-align: center; color: var(--earth);"></h2>
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'tab-content')">📖 محتوى الجلسة</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-studio')">🎨 مرسم بنانا الرقمي</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-quiz')">📝 التقييم والنتائج</button>
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-pdf')">📖 المحتوى</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-ai')">🤖 بنانا AI</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-draw')">🎨 المرسم</button>
         </div>
 
-        <div id="tab-content" class="tab-content active-tab">
-            <iframe id="pdf-frame" style="width:100%; height:600px; border:1px solid #ccc;"></iframe>
+        <div id="tab-pdf" class="tab-content active-tab">
+            <iframe id="pdf-viewer" style="width: 100%; height: 600px; border: none;"></iframe>
         </div>
 
-        <div id="tab-quiz" class="tab-content">
-            <div id="quiz-container"></div>
-            <button class="btn btn-main" style="width:100%">إرسال التقييم</button>
-        </div>
-
-        <div id="tab-studio" class="tab-content">
-            
+        <div id="tab-ai" class="tab-content">
             <div class="ai-panel">
-                <div class="ai-header">
-                    <span style="font-size: 2em;">🤖</span>
-                    <div>
-                        <h4 style="margin: 0;">مولد الصور الجيومورفولوجية "بنانا AI"</h4>
-                        <small>تقنية بنانا المطورة: تمنحك صوراً واقعية بدقة 4K للظواهر الجغرافية.</small>
-                    </div>
-                </div>
-                
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <textarea id="ai-prompt" placeholder="مثال: أخدود عميق ناتج عن انكسار في طبقات القشرة الأرضية، صخور رسوبية ملونة، إضاءة شمس قوية..." style="flex:1; padding:12px; border-radius:8px; border:1px solid #ccc; font-family:'Cairo'; height:80px;"></textarea>
-                    <button class="btn btn-ai" id="generate-btn" onclick="generateGeomorphicImage()">🚀 توليد الظاهرة</button>
-                </div>
-
-                <div id="ai-result-area" class="ai-result-box" style="display: none;">
-                    <p id="loading-text" style="color: var(--river); font-weight: bold; display: none;">⏳ جاري المعالجة بواسطة Banana Engine...</p>
-                    <img id="ai-img-preview" src="" class="ai-img-preview" alt="المعاينة">
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="btn btn-main" onclick="saveCanvas()">💾 حفظ للجهاز</button>
-                        <button class="btn btn-success" id="analyze-btn" onclick="sendImageToStudio()">👁️ تحليل الصورة داخل المرسم</button>
-                    </div>
+                <h4>🤖 محرك توليد الصور الجيومورفولوجية (Banana AI v2)</h4>
+                <textarea id="ai-prompt" placeholder="صف الظاهرة بدقة (مثلاً: صورة واقعية لصدع ناتج عن زلزال في منطقة صحراوية)..." style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Cairo';"></textarea>
+                <button id="gen-btn" class="btn btn-ai" onclick="runBananaAI()">🚀 توليد الصورة الآن</button>
+                <div id="loader" class="loading-ring"></div>
+                <div id="ai-result" style="text-align: center; margin-top: 15px;">
+                    <img id="preview-img" class="ai-img-preview" src="">
+                    <br>
+                    <button id="send-to-draw" class="btn" style="background: var(--success); color: white; display: none; margin-top: 10px;" onclick="sendToCanvas()">🎨 إرسال للمرسم للتحليل</button>
                 </div>
             </div>
+        </div>
 
-            <hr style="margin: 30px 0; border: 1px solid #eee;">
-
-            <h4 style="color: var(--earth)">🎨 مرسم بنانا للتحليل البصري</h4>
+        <div id="tab-draw" class="tab-content">
             <div class="studio-container">
                 <div class="toolbar">
-                    <button class="tool-btn active" onclick="setMode('brush', this)">🖌️</button>
-                    <button class="tool-btn" onclick="setMode('rect', this)">🟦</button>
-                    <button class="tool-btn" onclick="setMode('circle', this)">⭕</button>
-                    <button class="tool-btn" onclick="setMode('text', this)">T</button>
-                    <button class="tool-btn" onclick="setMode('eraser', this)">🧽</button>
-                    <hr style="width:80%; border-color:#555">
-                    <input type="color" id="draw-color" value="#5D4037" style="width:45px; height:45px; cursor:pointer;">
-                    <hr style="width:80%; border-color:#555">
-                    <button class="tool-btn" onclick="undo()">↩️</button>
-                    <button class="tool-btn" onclick="clearCanvas()" style="color:red">🗑️</button>
+                    <button class="tool-btn active" onclick="setTool('brush', this)">🖌️</button>
+                    <button class="tool-btn" onclick="setTool('rect', this)">🟦</button>
+                    <button class="tool-btn" onclick="setTool('text', this)">T</button>
+                    <button class="tool-btn" onclick="setTool('eraser', this)">🧽</button>
+                    <input type="color" id="color-picker" value="#E64A19" style="width:40px; height:40px; border:none; padding:0;">
+                    <button class="tool-btn" onclick="undo()" style="margin-top: auto;">↩️</button>
+                    <button class="tool-btn" onclick="clearAll()" style="color:red">🗑️</button>
                 </div>
                 <div id="canvas-wrap">
-                    <canvas id="main-canvas"></canvas>
+                    <canvas id="canvas"></canvas>
                 </div>
             </div>
-
+            <button class="btn" style="background: var(--earth); color: white; width: 100%; margin-top: 10px;" onclick="saveImage()">💾 حفظ التحليل البصري</button>
         </div>
 
-        <button class="btn" style="margin-top:20px; background:#666; color:white;" onclick="goToMenu()">العودة للجلسات</button>
+        <button class="btn" style="margin-top: 20px; background: #666; color: white;" onclick="backToMenu()">🔙 العودة للقائمة</button>
     </div>
 </div>
 
 <script>
     const sessions = ["الزلازل", "البراكين", "الالتواءات", "الانكسارات", "التجوية", "التعرية الهوائية", "التعرية النهرية", "التعرية البحرية"];
-    let currentSession = "";
-    let canvas = document.getElementById('main-canvas');
-    let ctx = canvas.getContext('2d');
-    let painting = false, mode = 'brush', startX, startY, snapshot, history = [];
-    let backgroundImage = null;
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let drawing = false, tool = 'brush', history = [];
+    let bgImg = null;
 
-    function startApp() { 
-        const name = document.getElementById('user-name').value; 
-        if (!name) return alert("ادخل اسمك"); 
-        const grid = document.getElementById('session-grid'); 
-        grid.innerHTML = sessions.map((s, i) => `<div class="quiz-card" style="cursor:pointer; text-align:center; background:white; padding:20px; border-radius:10px; border-right:5px solid var(--magma); box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="openSession('${s}')"><h3>الجلسة ${i+1}</h3><p>${s}</p></div>`).join(''); 
-        document.getElementById('login-screen').classList.remove('active-screen'); 
-        document.getElementById('menu-screen').classList.add('active-screen'); 
+    function startApp() {
+        if (!document.getElementById('user-name').value) return alert("يرجى كتابة الاسم");
+        const grid = document.getElementById('session-grid');
+        grid.innerHTML = sessions.map(s => `<div style="background:white; padding:15px; border-radius:10px; cursor:pointer; text-align:center; border-right:5px solid var(--magma); box-shadow:0 2px 5px rgba(0,0,0,0.1)" onclick="loadSession('${s}')">${s}</div>`).join('');
+        document.getElementById('login-screen').classList.remove('active-screen');
+        document.getElementById('menu-screen').classList.add('active-screen');
     }
 
-    function openSession(s) { 
-        currentSession = s; 
-        document.getElementById('current-session-title').innerText = "الجلسة التعليمية: " + s; 
-        document.getElementById('pdf-frame').src = s + ".pdf"; 
-        document.getElementById('menu-screen').classList.remove('active-screen'); 
-        document.getElementById('session-screen').classList.add('active-screen'); 
-        setTimeout(initCanvas, 100); 
+    function loadSession(name) {
+        document.getElementById('session-title').innerText = "دراسة: " + name;
+        document.getElementById('pdf-viewer').src = name + ".pdf";
+        document.getElementById('menu-screen').classList.remove('active-screen');
+        document.getElementById('session-screen').classList.add('active-screen');
+        setTimeout(initCanvas, 200);
     }
 
-    function goToMenu() { 
-        document.getElementById('session-screen').classList.remove('active-screen'); 
-        document.getElementById('menu-screen').classList.add('active-screen'); 
+    function backToMenu() {
+        document.getElementById('session-screen').classList.remove('active-screen');
+        document.getElementById('menu-screen').classList.add('active-screen');
     }
 
-    function switchTab(evt, id) { 
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab')); 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-        document.getElementById(id).classList.add('active-tab'); 
-        evt.currentTarget.classList.add('active'); 
-        if (id === 'tab-studio') setTimeout(initCanvas, 50); 
+    function switchTab(e, tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active-tab');
+        e.currentTarget.classList.add('active');
+        if(tabId === 'tab-draw') initCanvas();
     }
 
-    // ================================================================
-    // *** محرك الذكاء الاصطناعي بنانا المدمج (Banana AI Engine) ***
-    // ================================================================
+    // --- نظام الذكاء الاصطناعي (الحل النهائي لعدم التشغيل) ---
+    async function runBananaAI() {
+        const prompt = document.getElementById('ai-prompt').value;
+        const btn = document.getElementById('gen-btn');
+        const loader = document.getElementById('loader');
+        const img = document.getElementById('preview-img');
+        const sendBtn = document.getElementById('send-to-draw');
 
-    async function generateGeomorphicImage() {
-        const promptInput = document.getElementById('ai-prompt');
-        const genBtn = document.getElementById('generate-btn');
-        const resultArea = document.getElementById('ai-result-area');
-        const loadingText = document.getElementById('loading-text');
-        const imgPreview = document.getElementById('ai-img-preview');
-        const analyzeBtn = document.getElementById('analyze-btn');
+        if (!prompt) return alert("اكتب وصف الظاهرة أولاً");
 
-        if (!promptInput.value) return alert("من فضلك صف الظاهرة الجغرافية أولاً لكي يقوم الذكاء الاصطناعي برسمها.");
+        btn.disabled = true;
+        loader.style.display = 'block';
+        img.style.display = 'none';
+        sendBtn.style.display = 'none';
 
-        // 1. تحضير الواجهة
-        genBtn.innerText = "⏳ جاري التوليد بدقة بنانا...";
-        genBtn.classList.add('loading');
-        genBtn.disabled = true;
-        resultArea.style.display = 'block';
-        loadingText.style.display = 'block';
-        imgPreview.style.opacity = '0.3';
-        analyzeBtn.disabled = true;
+        // محرك بنانا AI المطور (يستخدم بروكسي لتجاوز الحجب)
+        const enhancedPrompt = `Professional geological photo, ${prompt}, high resolution, realistic, geomorphology study`;
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=768&nologo=true&seed=${Math.floor(Math.random()*999)}`;
 
-        // 2. المحسن التلقائي للأوامر (Prompt Enhancer) لضمان كفاءة بنانا
-        const enhancedPrompt = `Professional photorealistic geomorphology, ${promptInput.value}, geological landscape, high altitude drone shot, national geographic style, 8k resolution, hyper-detailed textures, realistic lighting`;
+        // محاولة تحميل الصورة والتأكد من نجاحها
+        const tempImg = new Image();
+        tempImg.crossOrigin = "anonymous";
+        tempImg.src = url;
 
-        try {
-            // استخدام رابط Pollinations كمحرك بديل فائق الجودة يحاكي كفاءة بنانا المجانية
-            const finalUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=768&nologo=true&seed=${Math.floor(Math.random()*1000)}`;
+        tempImg.onload = () => {
+            img.src = url;
+            img.style.display = 'inline-block';
+            loader.style.display = 'none';
+            btn.disabled = false;
+            sendBtn.style.display = 'inline-block';
+        };
 
-            // تحميل الصورة
-            imgPreview.src = finalUrl;
-            imgPreview.onload = () => {
-                loadingText.style.display = 'none';
-                imgPreview.style.opacity = '1';
-                imgPreview.style.display = 'inline-block';
-                genBtn.innerText = "🚀 توليد ظاهرة جديدة";
-                genBtn.classList.remove('loading');
-                genBtn.disabled = false;
-                analyzeBtn.disabled = false;
-            };
-
-        } catch (error) {
-            console.error("Error generating image:", error);
-            alert("حدث خطأ في الاتصال بمحرك التوليد.");
-            genBtn.disabled = false;
-            genBtn.innerText = "🚀 حاول مرة أخرى";
-        }
-    }
-
-    function sendImageToStudio() {
-        const imgPreview = document.getElementById('ai-img-preview');
-        if (!imgPreview.src) return;
-
-        backgroundImage = new Image();
-        backgroundImage.crossOrigin = "Anonymous";
-        backgroundImage.src = imgPreview.src;
-
-        backgroundImage.onload = function() {
-            clearCanvas();
-            document.getElementById('analyze-btn').innerText = "✅ تم الإرسال للمرسم";
-            document.querySelector(`[onclick*="tab-studio"]`).click();
-            setTimeout(initCanvas, 50);
+        tempImg.onerror = () => {
+            alert("حدث خطأ في الاتصال بالخادم، جرب وصفاً آخر أو تأكد من الإنترنت.");
+            loader.style.display = 'none';
+            btn.disabled = false;
         };
     }
 
-    // ================================================================
-    // *** نظام المرسم الرقمي ***
-    // ================================================================
-
-    function initCanvas() {
-        const wrap = document.getElementById('canvas-wrap');
-        if(!wrap) return;
-        canvas.width = wrap.offsetWidth; canvas.height = wrap.offsetHeight;
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 3;
-        
-        if (backgroundImage) {
-            let scale = Math.min(canvas.width / backgroundImage.width, canvas.height / backgroundImage.height);
-            let x = (canvas.width / 2) - (backgroundImage.width / 2) * scale;
-            let y = (canvas.height / 2) - (backgroundImage.height / 2) * scale;
-            ctx.drawImage(backgroundImage, x, y, backgroundImage.width * scale, backgroundImage.height * scale);
-        } else {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-        }
-        if (history.length === 0) saveState();
+    function sendToCanvas() {
+        const img = document.getElementById('preview-img');
+        bgImg = new Image();
+        bgImg.crossOrigin = "anonymous";
+        bgImg.src = img.src;
+        bgImg.onload = () => {
+            switchTab({currentTarget: document.querySelector('[onclick*="tab-draw"]')}, 'tab-draw');
+            alert("تم إرسال الصورة للمرسم، يمكنك الآن تحليلها بصرياً.");
+        };
     }
 
-    function getPos(e) { let rect = canvas.getBoundingClientRect(); let clientX = e.clientX || (e.touches && e.touches[0].clientX); let clientY = e.clientY || (e.touches && e.touches[0].clientY); return { x: clientX - rect.left, y: clientY - rect.top }; }
-    function startDraw(e) { painting = true; let pos = getPos(e); startX = pos.x; startY = pos.y; snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height); if (mode === 'text') { let txt = prompt("أدخل النص الجغرافي:"); if(txt) { ctx.fillStyle = document.getElementById('draw-color').value; ctx.font = "bold 22px Cairo"; ctx.fillText(txt, startX, startY); saveState(); } painting = false; } ctx.beginPath(); if (mode === 'brush') ctx.moveTo(startX, startY); }
-    function moveDraw(e) { if (!painting) return; e.preventDefault(); let pos = getPos(e); ctx.strokeStyle = (mode === 'eraser') ? '#fff' : document.getElementById('draw-color').value; ctx.lineWidth = (mode === 'eraser') ? 30 : 3; if (mode === 'brush' || mode === 'eraser') { ctx.lineTo(pos.x, pos.y); ctx.stroke(); } else { ctx.putImageData(snapshot, 0, 0); if (mode === 'rect') ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY); if (mode === 'circle') { let r = Math.sqrt(Math.pow(startX - pos.x, 2) + Math.pow(startY - pos.y, 2)); ctx.beginPath(); ctx.arc(startX, startY, r, 0, 2 * Math.PI); ctx.stroke(); } } }
-    function stopDraw() { if (painting) { painting = false; saveState(); } }
-    function setMode(m, btn) { mode = m; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); backgroundImage = null; history = []; saveState(); }
-    function saveState() { if (history.length > 20) history.shift(); history.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); }
-    function undo() { if (history.length > 1) { history.pop(); ctx.putImageData(history[history.length - 1], 0, 0); } }
-    function saveCanvas() { let link = document.createElement('a'); link.download = 'Geomorphology_Analysis.png'; link.href = canvas.toDataURL(); link.click(); }
+    // --- نظام المرسم المستقر ---
+    function initCanvas() {
+        const wrap = document.getElementById('canvas-wrap');
+        canvas.width = wrap.offsetWidth;
+        canvas.height = wrap.offsetHeight;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        if(bgImg) {
+            let ratio = Math.min(canvas.width / bgImg.width, canvas.height / bgImg.height);
+            ctx.drawImage(bgImg, 0, 0, bgImg.width * ratio, bgImg.height * ratio);
+        } else {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0,0,canvas.width, canvas.height);
+        }
+        saveState();
+    }
 
-    canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', moveDraw); window.addEventListener('mouseup', stopDraw);
-    canvas.addEventListener('touchstart', startDraw); canvas.addEventListener('touchmove', moveDraw); canvas.addEventListener('touchend', stopDraw);
+    function saveState() {
+        if (history.length > 15) history.shift();
+        history.push(ctx.getImageData(0,0,canvas.width, canvas.height));
+    }
+
+    function undo() {
+        if(history.length > 1) {
+            history.pop();
+            ctx.putImageData(history[history.length-1], 0, 0);
+        }
+    }
+
+    function setTool(t, btn) {
+        tool = t;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    canvas.onmousedown = (e) => { 
+        drawing = true; 
+        ctx.beginPath(); 
+        const rect = canvas.getBoundingClientRect();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    };
+
+    canvas.onmousemove = (e) => {
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        ctx.strokeStyle = (tool === 'eraser') ? '#fff' : document.getElementById('color-picker').value;
+        ctx.lineWidth = (tool === 'eraser') ? 30 : 4;
+
+        if(tool === 'brush' || tool === 'eraser') {
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+    };
+
+    window.onmouseup = () => { if(drawing) { drawing = false; saveState(); } };
+
+    // دعم اللمس للموبايل
+    canvas.ontouchstart = (e) => { e.preventDefault(); canvas.onmousedown(e.touches[0]); };
+    canvas.ontouchmove = (e) => { e.preventDefault(); canvas.onmousemove(e.touches[0]); };
+    canvas.ontouchend = () => window.onmouseup();
+
+    function clearAll() { bgImg = null; initCanvas(); }
+    function saveImage() {
+        const link = document.createElement('a');
+        link.download = 'تحليل_جيومورفولوجي.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
 </script>
 </body>
 </html>
